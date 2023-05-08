@@ -18,6 +18,14 @@ Card *CardPack::ChooseCard(ReviewOption opt) {
   return nullptr;
 }
 
+int CardPack::CountCards(ReviewOption opt) const {
+  // TODO: unimplemented
+  (void)opt;
+  return 0;
+}
+
+int CardPack::CountTotalCards() const { return cards.size(); }
+
 QDataStream &operator<<(QDataStream &out, CardPack const &pack) {
   // TODO: unimplemented
   (void)pack;

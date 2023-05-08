@@ -46,8 +46,8 @@ class AppSettings : public QObject {
 
   // API 设置
 
-  /// OpenAI API 的 URL. 默认为 "https://api.openai.com/v1/chat/completions".
-  QString api_url;
+  /// OpenAI API 的 base URL. 默认为 "https://api.openai.com".
+  QString api_base_url;
   /// OpenAI API 的密钥.
   QString api_key;
   /// OpenAI API 的 model 参数. 默认为 "gpt-3.5-turbo".

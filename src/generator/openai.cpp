@@ -17,13 +17,15 @@ void ApiRequest::SetModel(QString model) {
   (void)model;
 }
 
-void ApiRequest::AddMessage(QString role, QString content) {
+void ApiRequest::AddMessage(Role role, QString content) {
   // TODO: unimplemented
   (void)role, (void)content;
 }
 
 ApiManager::ApiManager(QObject *parent)
-    : mgr{*new QNetworkAccessManager(parent)}, current_reply{nullptr} {}
+    : QObject{parent},
+      mgr{new QNetworkAccessManager{this}},
+      current_reply{nullptr} {}
 
 void ApiManager::Send(ApiRequest const &request) {
   // TODO: unimplemented

@@ -6,6 +6,7 @@
 
 #include <QDir>
 #include <QStandardPaths>
+#include <QString>
 #include <QtDebug>
 
 namespace aijika {

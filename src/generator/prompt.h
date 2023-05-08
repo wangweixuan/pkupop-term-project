@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <QJsonObject>
 #include <QList>
 #include <QString>
 
@@ -28,16 +27,17 @@ struct Prompt {
   /// 题型的样例, 用于生成对话消息.
   QList<CardStem> examples;
 
-  /// 初始化空模板.
-  explicit Prompt() = default;
-  /// 从 JSON 对象 obj 初始化模板.
-  explicit Prompt(QJsonObject const &obj);
-
-  /// 将模板填充到指定的对话请求 request, 每则消息最多含 batch 个样例.
-  void ToMessages(ApiRequest &request, int batch) const;
+  /// 将模板填充到指定的对话请求 request.
+  void ToMessages(ApiRequest &request) const;
 };
 
 /// 从程序的 resources/prompts.json 文件读取模板列表.
 QList<Prompt> LoadPromptsFromResources();
+
+/// 将一组卡片内容编码成字符串.
+QString EncodeCardStems(QList<CardStem> const &cards);
+
+/// 从字符串解码出一组卡片内容.
+QList<CardStem> DecodeCardStems(QString const &content);
 
 }  // namespace aijika

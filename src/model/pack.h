@@ -34,14 +34,8 @@ struct CardPack {
   /// 卡片列表.
   QList<Card> cards;
 
-  /// 可以分配给 Card 的唯一标识符. 单调增长.
-  card_id_t incremental_card_id;
-
   /// 最近使用的 Prompt.
   prompt_id_t last_prompt;
-
-  /// 初始化空卡组.
-  explicit CardPack() = default;
 
   /// 查找卡片.
   Card *FindCard(card_id_t id);
@@ -49,6 +43,11 @@ struct CardPack {
   /// 根据复习方案 opt, 选出一张待复习的卡片.
   /// 如果没有卡片需要复习, 返回 nullptr.
   Card *ChooseCard(ReviewOption opt);
+
+  /// 根据复习方案 opt, 统计待复习卡片的数量.
+  int CountCards(ReviewOption opt) const;
+  /// 统计卡片的总数.
+  int CountTotalCards() const;
 
   /// 将 pack 序列化到数据流 out.
   friend QDataStream &operator<<(QDataStream &out, CardPack const &pack);

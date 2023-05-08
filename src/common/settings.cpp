@@ -6,7 +6,7 @@
 
 namespace aijika {
 
-AppSettings::AppSettings() {
+AppSettings::AppSettings() : QObject{nullptr} {
   // TODO: unimplemented
 }
 

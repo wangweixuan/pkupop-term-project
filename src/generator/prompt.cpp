@@ -6,18 +6,25 @@
 
 namespace aijika {
 
-Prompt::Prompt(QJsonObject const& obj) {
+void Prompt::ToMessages(ApiRequest &request) const {
   // TODO: unimplemented
-  (void)obj;
-}
-
-void Prompt::ToMessages(ApiRequest& request, int batch) const {
-  // TODO: unimplemented
-  (void)request, (void)batch;
+  (void)request;
 }
 
 QList<Prompt> LoadPromptsFromResources() {
   // TODO: unimplemented
+  return {};
+}
+
+QString EncodeCardStems(QList<CardStem> const &cards) {
+  // TODO: unimplemented
+  (void)cards;
+  return "";
+}
+
+QList<CardStem> DecodeCardStems(QString const &content) {
+  // TODO: unimplemented
+  (void)content;
   return {};
 }
 

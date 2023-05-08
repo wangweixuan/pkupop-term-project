@@ -33,7 +33,7 @@ using card_id_t = int;
 
 /// 卡片.
 struct Card {
-  /// 唯一标识符. 应在同一 CardPack 中无重复.
+  /// 唯一标识符. 应在同一 CardDatabase 中无重复.
   card_id_t id;
   /// 关键词.
   QString keyword;

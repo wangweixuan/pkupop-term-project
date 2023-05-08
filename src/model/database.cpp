@@ -6,9 +6,11 @@
 
 namespace aijika {
 
-CardPack *CardDatabase::FindPack(pack_id_t id) {
+CardDatabase::CardDatabase() : QObject{nullptr} {}
+
+CardPack *CardDatabase::FindPack(pack_id_t pack) {
   // TODO: unimplemented
-  (void)id;
+  (void)pack;
   return nullptr;
 }
 
