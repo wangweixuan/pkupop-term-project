@@ -32,6 +32,8 @@ qt_add_executable(aijika
     src/model/database.h
     src/model/pack.cpp
     src/model/pack.h
+    src/ui/components/packcombo.cpp
+    src/ui/components/packcombo.h
     src/ui/composerdialog.cpp
     src/ui/composerdialog.h
     src/ui/editordialog.cpp

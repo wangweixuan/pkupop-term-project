@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <QComboBox>
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QPushButton>
@@ -12,7 +11,9 @@
 #include <QWidget>
 
 #include "common/globals.h"
+#include "model/card.h"
 #include "model/pack.h"
+#include "ui/components/packcombo.h"
 
 namespace aijika {
 
@@ -29,8 +30,10 @@ class ManagerWindow : public QWidget {
   QPushButton *add_pack_button;
   QPushButton *edit_pack_button;
   QPushButton *remove_pack_button;
+  QPushButton *export_pack_button;
+  QPushButton *import_pack_button;
 
-  QComboBox *pack_combo;
+  PackCombo *pack_combo;
 
   QHBoxLayout *card_toolbar_layout;
   QPushButton *compose_card_button;
@@ -39,17 +42,26 @@ class ManagerWindow : public QWidget {
 
   QListWidget *card_list;
 
-  pack_id_t current_pack_id;
-  CardPack *current_pack;
-
  public:
+  /// 初始化管理卡片窗口.
   explicit ManagerWindow(AppGlobals &globals);
 
+  /// 设置界面状态, 使界面显示指定卡组及其中卡片列表.
+  /// pack 应匹配当前 pack_combo 所选的卡组, 或为 nullptr.
   void SetPack(CardPack *pack);
 
  public slots:
-  void InvalidatePack(CardPack &pack);
-  void InvalidateList();
+  /// 接收 CardDatabase 的信号, 更新卡片信息.
+  /// 只在 card 为当前列表中的卡片时有效.
+  void UpdateCard(Card &card);
+
+  /// 接收 PackCombo 的信号, 切换所选卡组.
+  /// 另见 SetPack().
+  void ChangePack(CardPack *pack);
+
+  /// 接收 PackCombo 的信号, 更新卡组信息.
+  /// 另见 SetPack().
+  void UpdatePack(CardPack &pack);
 };
 
 }  // namespace aijika

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QWidget>
 
 #include "common/globals.h"
 #include "model/card.h"
@@ -19,20 +20,15 @@ class EditorDialog : public QDialog {
  private:
   AppGlobals &globals;
 
-  card_id_t current_card_id;
-  pack_id_t pack_id_t;
-  Card *current_card;
-  CardPack *current_pack;
+  card_id_t card_id;
+  pack_id_t pack_id;
 
  public:
   explicit EditorDialog(QWidget *parent, AppGlobals &globals);
 
-  void SetCard(Card *card);
-  void SetPack(CardPack *pack);
+  void SetCard(Card &card);
 
- public slots:
-  void InvalidatePack(CardPack &pack);
-  void InvalidateList();
+  void SetPack(CardPack &pack);
 };
 
 }  // namespace aijika

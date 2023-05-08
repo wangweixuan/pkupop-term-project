@@ -13,13 +13,6 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   // TODO: layout unimplemented
 }
 
-void ComposerDialog::SetPack(CardPack *pack) {
-  // TODO: unimplemented
-  (void)pack;
-}
-
-void ComposerDialog::InvalidateList() {
-  // TODO: unimplemented
-}
+void ComposerDialog::SetPack(CardPack *pack) { pack_combo->SetPack(pack); }
 
 }  // namespace aijika

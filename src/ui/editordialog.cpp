@@ -13,23 +13,14 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
   // TODO: layout unimplemented
 }
 
-void EditorDialog::SetCard(Card *card) {
+void EditorDialog::SetCard(Card &card) {
   // TODO: unimplemented
   (void)card;
 }
 
-void EditorDialog::SetPack(CardPack *pack) {
+void EditorDialog::SetPack(CardPack &pack) {
   // TODO: unimplemented
   (void)pack;
-}
-
-void EditorDialog::InvalidatePack(CardPack &pack) {
-  // TODO: unimplemented
-  (void)pack;
-}
-
-void EditorDialog::InvalidateList() {
-  // TODO: unimplemented
 }
 
 }  // namespace aijika

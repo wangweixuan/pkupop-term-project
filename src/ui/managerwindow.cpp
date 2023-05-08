@@ -18,13 +18,19 @@ void ManagerWindow::SetPack(CardPack *pack) {
   (void)pack;
 }
 
-void ManagerWindow::InvalidatePack(CardPack &pack) {
+void ManagerWindow::UpdateCard(Card &card) {
+  // TODO: unimplemented
+  (void)card;
+}
+
+void ManagerWindow::ChangePack(CardPack *pack) {
   // TODO: unimplemented
   (void)pack;
 }
 
-void ManagerWindow::InvalidateList() {
+void ManagerWindow::UpdatePack(CardPack &pack) {
   // TODO: unimplemented
+  (void)pack;
 }
 
 }  // namespace aijika
