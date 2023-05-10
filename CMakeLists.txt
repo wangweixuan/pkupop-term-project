@@ -48,9 +48,7 @@ qt_add_executable(aijika
     resources/resources.rc
 )
 
-target_include_directories(aijika PRIVATE
-    src
-)
+target_include_directories(aijika PRIVATE src)
 
 target_link_libraries(aijika PRIVATE
     Qt::Core
@@ -67,6 +65,7 @@ set_source_files_properties(resources/icon.icns PROPERTIES
     MACOSX_PACKAGE_LOCATION "Resources")
 
 set_target_properties(aijika PROPERTIES
+    OUTPUT_NAME Aijika
     EXPORT_COMPILE_COMMANDS ON
     MACOSX_BUNDLE TRUE
     MACOSX_BUNDLE_BUNDLE_NAME "AI 记卡"
@@ -82,3 +81,35 @@ install(TARGETS aijika
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if(DEFINED ENV{AIJIKA_TEST})
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG bc860af08783b8113005ca7697da5f5d49a8056f
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+
+    qt_add_executable(
+        aijika_test
+        src/generator/openai.cpp
+        src/generator/prompt.cpp
+        src/generator/prompt_test.cpp
+        src/model/card.cpp
+    )
+
+    target_include_directories(aijika_test PRIVATE src)
+
+    target_link_libraries(aijika_test PRIVATE
+        Qt::Core
+        Qt::Network
+        GTest::gtest_main
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(aijika_test)
+endif()
