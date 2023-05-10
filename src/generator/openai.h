@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <QByteArray>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
-#include <QStringList>
 
 namespace aijika {
 
@@ -27,17 +27,17 @@ class ApiRequest {
   /// 请求体 JSON.
   QJsonObject json;
 
-  /// 请求体中的字符串列表.
-  QStringList strings;
-
   /// 初始化空请求.
   explicit ApiRequest();
 
   /// 设置要使用的 model.
-  void SetModel(QString model);
+  void SetModel(QString const &model);
 
   /// 添加对话消息作为上文.
-  void AddMessage(Role role, QString content);
+  void AddMessage(Role role, QString const &content);
+
+  /// 将请求转化为载荷.
+  QByteArray Build() const;
 };
 
 /// 包装了 OpenAI API 的服务.

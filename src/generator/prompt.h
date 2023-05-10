@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <QByteArray>
 #include <QList>
 #include <QString>
 
@@ -11,6 +12,16 @@
 #include "model/card.h"
 
 namespace aijika {
+
+/// 一组卡片内容.
+class CardStemList : public QList<CardStem> {
+ public:
+  /// 将一组卡片内容编码成字符串.
+  QByteArray Encode() const;
+
+  /// 从字符串解码出一组卡片内容.
+  void Decode(QByteArray const &content);
+};
 
 /// Prompt 的唯一标识符类型.
 using prompt_id_t = int;
@@ -25,7 +36,7 @@ struct Prompt {
   /// https://platform.openai.com/docs/api-reference/chat/create#chat/create-role
   QString system;
   /// 题型的样例, 用于生成对话消息.
-  QList<CardStem> examples;
+  CardStemList examples;
 
   /// 将模板填充到指定的对话请求 request.
   void ToMessages(ApiRequest &request) const;
@@ -34,10 +45,7 @@ struct Prompt {
 /// 从程序的 resources/prompts.json 文件读取模板列表.
 QList<Prompt> LoadPromptsFromResources();
 
-/// 将一组卡片内容编码成字符串.
-QString EncodeCardStems(QList<CardStem> const &cards);
-
-/// 从字符串解码出一组卡片内容.
-QList<CardStem> DecodeCardStems(QString const &content);
+/// 从 JSON 文件内容读取模板列表.
+QList<Prompt> LoadPromptsFromData(QByteArray const &data);
 
 }  // namespace aijika

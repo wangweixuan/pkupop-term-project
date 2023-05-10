@@ -11,7 +11,6 @@
 #include "common/settings.h"
 #include "generator/openai.h"
 #include "generator/prompt.h"
-#include "model/card.h"
 
 namespace aijika {
 
@@ -54,7 +53,7 @@ class CardGenerator : public QObject {
 
  signals:
   /// 卡片生成成功时发出的信号.
-  void generated(QList<Card> cards);
+  void generated(CardStemList cards);
 
   /// 卡片生成失败时发出的信号.
   void error(QString message);
