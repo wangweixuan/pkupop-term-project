@@ -2,3 +2,4 @@ build
 .cache
 *.pro.user*
 CMakeLists.txt.user*
+compile_commands.json

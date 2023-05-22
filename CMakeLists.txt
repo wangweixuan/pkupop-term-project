@@ -66,7 +66,6 @@ set_source_files_properties(resources/icon.icns PROPERTIES
 
 set_target_properties(aijika PROPERTIES
     OUTPUT_NAME Aijika
-    EXPORT_COMPILE_COMMANDS ON
     MACOSX_BUNDLE TRUE
     MACOSX_BUNDLE_BUNDLE_NAME "AI 记卡"
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
@@ -81,6 +80,13 @@ install(TARGETS aijika
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if(DEFINED ENV{AIJIKA_COMPILE_COMMANDS})
+    set_target_properties(aijika PROPERTIES EXPORT_COMPILE_COMMANDS ON)
+
+    file(CREATE_LINK "${CMAKE_BINARY_DIR}/compile_commands.json"
+        "${CMAKE_SOURCE_DIR}/compile_commands.json" SYMBOLIC)
+endif()
 
 if(DEFINED ENV{AIJIKA_TEST})
     include(FetchContent)
