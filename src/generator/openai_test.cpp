@@ -33,14 +33,16 @@ TEST(OpenAiTest, BuildRequest) {
       R"({"messages":[{"content":"Say hello, World!","role":"user"},{"content":"Hello, World!","role":"assistant"},{"content":"Say hello, Aijika!","role":"user"}],"model":"gpt-3.5-turbo"})");
 }
 
-TEST(OpenAiTest, SendRequest) {
+TEST(OpenAiTest, DISABLED_SendRequest) {
   ApiManager mgr{nullptr};
   auto api_base_url = qEnvironmentVariable("OPENAI_BASE_URL");
   auto api_key = qEnvironmentVariable("OPENAI_API_KEY");
-  ASSERT_TRUE(api_base_url.size() > 0) << "Set OPENAI_BASE_URL before testing!";
-  ASSERT_TRUE(api_key.size() > 0) << "Set OPENAI_API_KEY before testing!";
-  mgr.api_base_url = api_base_url;
-  mgr.api_key = api_key;
+  if (api_base_url.size()) {
+    mgr.api_base_url = api_base_url;
+  }
+  if (api_key.size()) {
+    mgr.api_key = api_key;
+  }
 
   auto request = ExampleRequest();
 
