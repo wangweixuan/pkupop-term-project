@@ -81,13 +81,6 @@ install(TARGETS aijika
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-if(DEFINED ENV{AIJIKA_COMPILE_COMMANDS})
-    set_target_properties(aijika PROPERTIES EXPORT_COMPILE_COMMANDS ON)
-
-    file(CREATE_LINK "${CMAKE_BINARY_DIR}/compile_commands.json"
-        "${CMAKE_SOURCE_DIR}/compile_commands.json" SYMBOLIC)
-endif()
-
 if(DEFINED ENV{AIJIKA_TEST})
     include(FetchContent)
     FetchContent_Declare(
