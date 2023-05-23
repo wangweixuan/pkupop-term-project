@@ -31,6 +31,7 @@ void CardGenerator::Generate(Prompt const &prompt, QString keywords) {
   ApiRequest request;
   prompt.ToMessages(request);
 
+  request.SetModel(settings.api_model);
   request.AddMessage(ApiRequest::Role::user, keywords);
 
   mgr->Send(request);

@@ -4,6 +4,7 @@
 
 #include "common/globals.h"
 
+#include <QDataStream>
 #include <QDir>
 #include <QStandardPaths>
 #include <QString>
@@ -24,23 +25,39 @@ AppGlobals::AppGlobals()
       db_file{GetFile("db.json", Loc::AppDataLocation)} {}
 
 void AppGlobals::SaveSettings() {
-  // TODO: unimplemented
   qDebug() << "Save settings:" << settings_file.fileName();
+
+  settings_file.open(QFile::WriteOnly);
+  QDataStream out{&settings_file};
+  out << settings;
+  settings_file.close();
 }
 
 void AppGlobals::RestoreSettings() {
-  // TODO: unimplemented
   qDebug() << "Restore settings:" << settings_file.fileName();
+
+  settings_file.open(QFile::ReadOnly);
+  QDataStream in{&settings_file};
+  in >> settings;
+  settings_file.close();
 }
 
 void AppGlobals::SaveDatabase() {
-  // TODO: unimplemented
   qDebug() << "Save database:" << db_file.fileName();
+
+  db_file.open(QFile::WriteOnly);
+  QDataStream out{&db_file};
+  out << db;
+  db_file.close();
 }
 
 void AppGlobals::RestoreDatabase() {
-  // TODO: unimplemente
   qDebug() << "Restore database:" << db_file.fileName();
+
+  db_file.open(QFile::ReadOnly);
+  QDataStream in{&db_file};
+  in >> db;
+  db_file.close();
 }
 
 }  // namespace aijika
