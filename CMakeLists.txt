@@ -96,11 +96,17 @@ if(DEFINED ENV{AIJIKA_TEST})
     qt_add_executable(
         aijika_test
         src/main_test.cpp
+        src/common/globals.cpp
+        src/common/globals_test.cpp
+        src/common/settings.cpp
+        src/common/settings_test.cpp
         src/generator/openai.cpp
         src/generator/openai_test.cpp
         src/generator/prompt.cpp
         src/generator/prompt_test.cpp
         src/model/card.cpp
+        src/model/database.cpp
+        src/model/pack.cpp
     )
 
     target_include_directories(aijika_test PRIVATE src)
