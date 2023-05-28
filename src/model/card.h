@@ -22,10 +22,10 @@ struct CardStem {
 
 /// 用户对卡片记忆程度的分级. 用于间隔重复算法.
 enum struct UserQuality {
-  again=4,  // 完全忘记.
-  hard=3,
-  good=2,
-  easy=1,  // 完全掌握.
+  again = 4,  // 完全忘记.
+  hard = 3,
+  good = 2,
+  easy = 1,  // 完全掌握.
 };
 
 /// Card 的唯一标识符类型.
@@ -63,13 +63,13 @@ struct Card {
   explicit Card(CardStem const &stem);
 
   /// 根据用户对卡片的分级 quality, 更新用于间隔重复算法的各个属性.
+  /// 调用者应负责发出 CardDatabase::card_updated 信号.
   void Update(UserQuality quality);
 
   /// 将 card 序列化到数据流 out.
   friend QDataStream &operator<<(QDataStream &out, Card const &card);
   /// 从数据流 in 反序列化 card.
   friend QDataStream &operator>>(QDataStream &in, Card &card);
-
 };
 
 }  // namespace aijika
