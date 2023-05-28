@@ -6,6 +6,7 @@
 
 #include "common/globals.h"
 #include "ui/studywindow.h"
+#include <QDebug>
 
 int main(int argc, char *argv[]) {
   using namespace aijika;
@@ -19,6 +20,5 @@ int main(int argc, char *argv[]) {
 
   StudyWindow window{globals};
   window.show();
-
   return app.exec();
 }
