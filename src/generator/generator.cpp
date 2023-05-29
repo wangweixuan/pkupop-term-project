@@ -22,6 +22,8 @@ CardGenerator::CardGenerator(QObject *parent, AppSettings &settings)
       mgr{new ApiManager{this}},
       settings{settings},
       prompts{LoadPromptsFromResources()} {
+  connect(mgr, &ApiManager::response, this, &CardGenerator::ApiResponse);
+  connect(mgr, &ApiManager::error, this, &CardGenerator::ApiError);
   connect(&settings, &AppSettings::api_updated, this,
           &CardGenerator::UpdateApiSettings);
   UpdateApiSettings();
