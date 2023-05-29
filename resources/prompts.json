@@ -5,9 +5,14 @@
     "system": "你要为英语学习者制作单词记忆卡片。我将在每一行提出一个英语单词或短语，你要分别生成记忆卡片并返回 JSON 数组。每张卡片表示为 3 个 JSON 字符串，首先是我提供的英语单词，然后是卡片正面（单词及其发音），最后是卡片背面（中文释义）。",
     "examples": [
       {
-        "keyword": "run",
-        "question": "run [/rʌn/]",
-        "answer": "n. 奔跑；竞赛；连续的演出\nadj. 连续的；流畅的"
+        "keyword": "disability",
+        "question": "disability |ˌdɪsəˈbɪlədi|",
+        "answer": "n. 残疾，不利条件"
+      },
+      {
+        "keyword": "wait",
+        "question": "wait |weɪt|",
+        "answer": "v. 等待，盼望\nn. 等待"
       }
     ]
   }
