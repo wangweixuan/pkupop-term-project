@@ -33,9 +33,9 @@ Windows 平台: 下载[在线安装器](https://mirrors.tuna.tsinghua.edu.cn/hel
 1. 设置环境变量: `export AIJIKA_TEST=1`
 2. 配置, 并从 GitHub 下载 GoogleTest 库: `cmake -B build .`
 3. 构建: `cmake --build build`
-4. 运行测试: `cd build && ctest`
+4. 运行测试: `./build/aijika_test`
 
 注意部分测试需访问 OpenAI 服务, 默认不会运行. 要运行这些测试:
 
 1. 设置环境变量 `OPENAI_BASE_URL` 和 `OPENAI_API_KEY` (可选).
-2. 运行测试: `ctest --gtest_also_run_disabled_tests`
+2. 运行测试: `./build/aijika_test --gtest_also_run_disabled_tests`

@@ -100,6 +100,8 @@ if(DEFINED ENV{AIJIKA_TEST})
         src/common/globals_test.cpp
         src/common/settings.cpp
         src/common/settings_test.cpp
+        src/generator/generator.cpp
+        src/generator/generator_test.cpp
         src/generator/openai.cpp
         src/generator/openai_test.cpp
         src/generator/prompt.cpp
@@ -115,6 +117,10 @@ if(DEFINED ENV{AIJIKA_TEST})
         Qt::Core
         Qt::Network
         GTest::gtest_main
+    )
+
+    qt_add_resources(aijika_test "resources" PREFIX "/" FILES
+        resources/prompts.json
     )
 
     include(GoogleTest)

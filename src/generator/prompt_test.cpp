@@ -102,5 +102,12 @@ TEST(PromptTest, LoadFromData) {
   EXPECT_EQ(prompts[1].examples.size(), 1);
 }
 
+TEST(PromptTest, LoadFromResources) {
+  auto prompts = LoadPromptsFromResources();
+
+  EXPECT_EQ(prompts[0].id, 101);
+  EXPECT_EQ(prompts[0].label, "英语单词");
+}
+
 }  // namespace
 }  // namespace aijika
