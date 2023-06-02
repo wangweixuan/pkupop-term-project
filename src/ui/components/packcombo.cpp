@@ -49,6 +49,7 @@ PackCombo::PackCombo(QWidget *parent, AppGlobals &globals)
 
 // 获取所选卡组
 CardPack *PackCombo::GetPack() {
+    qDebug()<<"getpack被调用了，此时pack_id="<<pack_id;
     if (pack_id == -1) {
         return nullptr;
     } else {
