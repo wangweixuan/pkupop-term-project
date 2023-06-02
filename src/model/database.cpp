@@ -49,10 +49,9 @@ void CardDatabase::RemoveCard(card_id_t card, CardPack &pack) {
 }
 
 QDataStream &operator<<(QDataStream &out, CardDatabase const &db) {
-  out << db.packs.size();
-  for (auto const &pack : db.packs) {
-    out << pack;
-  }
+  int tmp=db.packs.size();
+  out << tmp;
+  out << db.packs;
   out << db.incremental_pack_id;
   out << db.incremental_card_id;
   out << db.last_visited_pack;
@@ -63,11 +62,7 @@ QDataStream &operator>>(QDataStream &in, CardDatabase &db) {
   int n;
   in >> n;
   db.packs.clear();
-  for (int i = 0; i < n; i++) {
-    CardPack pack;
-    in >> pack;
-    db.packs.append(pack);
-  }
+  in >> db.packs;
   in >> db.incremental_pack_id;
   in >> db.incremental_card_id;
   in >> db.last_visited_pack;

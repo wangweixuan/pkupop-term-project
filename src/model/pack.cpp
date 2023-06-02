@@ -69,10 +69,9 @@ int CardPack::CountTotalCards() const { return cards.size(); }
 QDataStream &operator<<(QDataStream &out, CardPack const &pack) {
   out << pack.id;
   out << pack.label;
-  out << pack.cards.size();
-  for (auto const &card : pack.cards) {
-    out << card;
-  }
+  int tmp=pack.cards.size();
+  out << tmp;
+  out<<pack.cards;
   out << pack.last_prompt;
   return out;
 }
@@ -83,11 +82,7 @@ QDataStream &operator>>(QDataStream &in, CardPack &pack) {
   in >> pack.label;
   in >> n;
   pack.cards.clear();
-  for (int i = 0; i < n; i++) {
-    Card card;
-    in >> card;
-    pack.cards.append(card);
-  }
+  in>>pack.cards;
   in >> pack.last_prompt;
   return in;
 }
