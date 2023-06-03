@@ -16,7 +16,7 @@
 namespace aijika {
 
 ApiRequest::ApiRequest() {
-  json["model"] = "gpt-3.5-turbo";  // 默认值
+  json["model"] = "";
   json["messages"] = QJsonArray{};
   // 其他参数暂不需要
 }
@@ -48,8 +48,7 @@ QByteArray ApiRequest::Build() const {
 ApiManager::ApiManager(QObject *parent)
     : QObject{parent},
       mgr{new QNetworkAccessManager{this}},
-      current_reply{nullptr},
-      api_base_url{"https://api.openai.com"} {
+      current_reply{nullptr} {
   connect(mgr, &QNetworkAccessManager::finished, this,
           &ApiManager::FinishReply);
 }

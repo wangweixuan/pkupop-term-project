@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   app.setApplicationName("Aijika");
   app.setApplicationDisplayName("AI 记卡");
 
-  AppGlobals globals;
+  AppGlobals globals{&app};
 
   CardStem card1{"apple", "Which fruit is red, round and juicy?", "Apple."};
   CardStem card2{"dog", "What domesticated animal is a man's best friend?",

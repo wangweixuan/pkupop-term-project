@@ -4,7 +4,14 @@
 
 #pragma once
 
+#include <QBoxLayout>
+#include <QButtonGroup>
+#include <QComboBox>
 #include <QFormLayout>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QSpinBox>
 #include <QWidget>
 
 #include "common/globals.h"
@@ -18,7 +25,21 @@ class SettingsWindow : public QWidget {
  private:
   AppGlobals &globals;
 
-  QFormLayout *main_layout;
+  QVBoxLayout *main_layout;
+
+  QGroupBox *appearance_group;
+  QFormLayout *appearance_layout;
+  QComboBox *font_family_box;
+  QSpinBox *font_size_box;
+  QButtonGroup *theme_group;
+  QHBoxLayout *theme_layout;
+  QRadioButton *theme_buttons[4];
+
+  QGroupBox *api_group;
+  QFormLayout *api_layout;
+  QComboBox *api_base_url_edit;
+  QLineEdit *api_key_edit;
+  QComboBox *api_model_edit;
 
  public:
   explicit SettingsWindow(AppGlobals &globals);

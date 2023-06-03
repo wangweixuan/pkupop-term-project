@@ -27,6 +27,18 @@ enum struct PredefinedTheme {
   black,   // 黑底白字.
 };
 
+constexpr char const *k_predefined_font_names[5]{
+    "Old style", "Transitional", "Neo-Grotesk", "Geometric", "Humanistic"};
+
+constexpr char const *k_predefined_theme_names[4]{"白色", "纸张", "灰暗",
+                                                  "夜间"};
+
+constexpr char const *k_predefined_api_base_url[2]{"https://api.openai.com",
+                                                   "http://localhost:8080"};
+
+constexpr char const *k_predefined_api_model[3]{"gpt-3.5-turbo", "gpt-4",
+                                                "gpt-4-32k"};
+
 /// 程序的设置, 与设置文件关联.
 class AppSettings : public QObject {
   Q_OBJECT;
@@ -58,6 +70,18 @@ class AppSettings : public QObject {
   /// 根据卡片界面字体、字号、颜色主题, 生成 Qt 样式表.
   /// 见 https://doc.qt.io/qt-6/stylesheet.html
   QString StyleSheet() const;
+
+  void SetFontFamily(int which);
+
+  void SetFontSize(int value);
+
+  void SetTheme(int which);
+
+  void SetApiBaseUrl(QString const &value);
+
+  void SetApiKey(QString const &value);
+
+  void SetApiModel(QString const &value);
 
   /// 将 settings 序列化到数据流 out.
   friend QDataStream &operator<<(QDataStream &out, AppSettings const &settings);

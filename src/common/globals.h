@@ -5,6 +5,7 @@
 #pragma once
 
 #include <QFile>
+#include <QObject>
 
 #include "common/settings.h"
 #include "model/database.h"
@@ -12,7 +13,9 @@
 namespace aijika {
 
 /// 程序的全局状态.
-class AppGlobals {
+class AppGlobals : public QObject {
+  Q_OBJECT;
+
  public:
   /// 程序的设置文件.
   QFile settings_file;
@@ -25,8 +28,9 @@ class AppGlobals {
 
   /// 初始化全局状态. 应在初始化前设置 QCoreApplication 的 organizationName 和
   /// applicationName 属性.
-  explicit AppGlobals();
+  explicit AppGlobals(QObject *parent);
 
+ public slots:
   /// 保存设置到文件.
   void SaveSettings();
   /// 从文件读取设置.

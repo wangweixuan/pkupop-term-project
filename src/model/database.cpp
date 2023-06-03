@@ -49,8 +49,6 @@ void CardDatabase::RemoveCard(card_id_t card, CardPack &pack) {
 }
 
 QDataStream &operator<<(QDataStream &out, CardDatabase const &db) {
-  int tmp = db.packs.size();
-  out << tmp;
   out << db.packs;
   out << db.incremental_pack_id;
   out << db.incremental_card_id;
@@ -59,9 +57,7 @@ QDataStream &operator<<(QDataStream &out, CardDatabase const &db) {
 }
 
 QDataStream &operator>>(QDataStream &in, CardDatabase &db) {
-  int n;
-  in >> n;
-  db.packs.clear();
+  /* db.packs.clear(); */
   in >> db.packs;
   in >> db.incremental_pack_id;
   in >> db.incremental_card_id;

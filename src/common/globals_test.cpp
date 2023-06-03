@@ -13,20 +13,20 @@ namespace {
 
 TEST(GlobalsTest, SaveRestore) {
   {
-    AppGlobals globals;
+    AppGlobals globals{nullptr};
     globals.RestoreDatabase();
 
     globals.settings.font_size = 42;
     globals.SaveSettings();
   }
   {
-    AppGlobals globals;
+    AppGlobals globals{nullptr};
 
     globals.db.last_visited_pack = 17;
     globals.SaveDatabase();
   }
   {
-    AppGlobals globals;
+    AppGlobals globals{nullptr};
     globals.RestoreSettings();
 
     EXPECT_EQ(globals.settings.font_size, 42);

@@ -5,6 +5,7 @@
 #include "common/settings.h"
 
 #include <QStringList>
+#include <QtDebug>
 
 namespace aijika {
 
@@ -13,9 +14,9 @@ AppSettings::AppSettings()
       font_family{PredefinedFont::humanistic},
       font_size{14},
       theme{PredefinedTheme::yellow},
-      api_base_url{"https://api.openai.com"},
+      api_base_url{k_predefined_api_base_url[0]},
       api_key{},
-      api_model{"gpt-3.5-turbo"} {}
+      api_model{k_predefined_api_model[0]} {}
 
 namespace predefined_styles {
 // Taken from https://github.com/system-fonts/modern-font-stacks
@@ -26,7 +27,7 @@ constexpr char const *k_font_families[5]{
     "'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, '楷体', "
     "serif",
     /* transitional */
-    "font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, '宋体', "
+    "Charter, 'Bitstream Charter', 'Sitka Text', Cambria, '宋体', "
     "serif",
     /* neo_grotesk */
     "Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, "
@@ -35,7 +36,7 @@ constexpr char const *k_font_families[5]{
     "Avenir, 'Avenir Next LT Pro', Montserrat, Corbel, 'URW Gothic', "
     "source-sans-pro, '黑体', sans-serif",
     /* humanistic */
-    "'Optima, Candara, 'Noto Sans', source-sans-pro, '黑体', sans-serif'"};
+    "Optima, Candara, 'Noto Sans', source-sans-pro, '楷体', sans-serif"};
 
 constexpr char const *k_background_colors[4]{/* white */
                                              "#fcfcfc",
@@ -63,12 +64,55 @@ QString AppSettings::StyleSheet() const {
                     k_font_families[int(font_family)],
                     "; font-size:",
                     QString::number(font_size),
-                    "; background-color:",
+                    "pt; background-color:",
                     k_background_colors[int(theme)],
                     "; color:",
                     k_colors[int(theme)],
                     "; }"};
-  return parts.join(" ");
+  return parts.join("");
+}
+
+void AppSettings::SetFontFamily(int which) {
+  auto value = static_cast<PredefinedFont>(which);
+  if (value == font_family) return;
+  font_family = value;
+  emit appearance_updated();
+}
+
+void AppSettings::SetFontSize(int value) {
+  if (value < 8) {
+    value = 8;
+  } else if (value > 32) {
+    value = 32;
+  }
+  if (value == font_size) return;
+  font_size = value;
+  emit appearance_updated();
+}
+
+void AppSettings::SetTheme(int which) {
+  auto value = static_cast<PredefinedTheme>(which);
+  if (value == theme) return;
+  theme = value;
+  emit appearance_updated();
+}
+
+void AppSettings::SetApiBaseUrl(QString const &value) {
+  if (value == api_base_url) return;
+  api_base_url = value;
+  emit api_updated();
+}
+
+void AppSettings::SetApiKey(QString const &value) {
+  if (value == api_key) return;
+  api_key = value;
+  emit api_updated();
+}
+
+void AppSettings::SetApiModel(QString const &value) {
+  if (value == api_model) return;
+  api_model = value;
+  emit api_updated();
 }
 
 QDataStream &operator<<(QDataStream &out, AppSettings const &settings) {

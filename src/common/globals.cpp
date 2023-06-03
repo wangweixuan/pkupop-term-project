@@ -10,6 +10,8 @@
 #include <QString>
 #include <QtDebug>
 
+#include "common/settings.h"
+
 namespace aijika {
 
 using Loc = QStandardPaths::StandardLocation;
@@ -20,9 +22,20 @@ QString GetFile(QString const &fileName, Loc loc) {
   return dir.absoluteFilePath(fileName);
 }
 
-AppGlobals::AppGlobals()
-    : settings_file{GetFile("settings.json", Loc::AppConfigLocation)},
-      db_file{GetFile("db.json", Loc::AppDataLocation)} {}
+AppGlobals::AppGlobals(QObject *parent)
+    : QObject{parent},
+      settings_file{GetFile("settings.bin", Loc::AppConfigLocation)},
+      db_file{GetFile("db.bin", Loc::AppDataLocation)} {
+  connect(&settings, &AppSettings::appearance_updated, this,
+          &AppGlobals::SaveSettings);
+  connect(&settings, &AppSettings::learning_updated, this,
+          &AppGlobals::SaveSettings);
+  connect(&settings, &AppSettings::api_updated, this,
+          &AppGlobals::SaveSettings);
+  connect(&db, &CardDatabase::card_updated, this, &AppGlobals::SaveDatabase);
+  connect(&db, &CardDatabase::pack_updated, this, &AppGlobals::SaveDatabase);
+  connect(&db, &CardDatabase::list_updated, this, &AppGlobals::SaveDatabase);
+}
 
 void AppGlobals::SaveSettings() {
   qDebug() << "Save settings:" << settings_file.fileName();
