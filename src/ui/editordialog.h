@@ -5,11 +5,11 @@
 #pragma once
 
 #include <QDialog>
-#include <QWidget>
 #include <QLabel>
-#include <QTextEdit>
 #include <QLayout>
 #include <QListWidget>
+#include <QTextEdit>
+#include <QWidget>
 
 #include "common/globals.h"
 #include "model/card.h"
@@ -28,7 +28,7 @@ class EditorDialog : public QDialog {
   card_id_t card_id;
   pack_id_t pack_id;
 
-  ///卡组选择，关键词，正面，背面编辑框
+  /// 卡组选择，关键词，正面，背面编辑框
   PackCombo *pack_list;
   QLabel *choosecard_text;
   QLabel *choosepack_text;
@@ -44,13 +44,13 @@ class EditorDialog : public QDialog {
   QVBoxLayout *main_layout;
   QHBoxLayout *LayoutH[6];
 
-  ///卡组的列表
+  /// 卡组的列表
   QListWidget *card_list;
 
-  ///保存按钮
+  /// 保存按钮
   QPushButton *save;
 
-  ///取消按钮
+  /// 取消按钮
   QPushButton *cancel;
 
  public:

@@ -34,7 +34,7 @@ Card::Card(CardStem const &stem)
 
 void Card::Update(UserQuality qualityy) {
   int quality = int(qualityy);
-    interval=1;
+  interval = 1;
   if (qualityy == UserQuality::again) {
     easiness = std::max(1.3, easiness - 0.2);
     interval = 1;

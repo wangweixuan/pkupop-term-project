@@ -5,11 +5,11 @@
 #pragma once
 
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QLabel>
 
 #include "common/globals.h"
 #include "model/card.h"
@@ -23,7 +23,7 @@ class ManagerWindow : public QWidget {
   Q_OBJECT;
 
  private:
-  ///当前显示的组数，随着添加卡片而更新
+  /// 当前显示的组数，随着添加卡片而更新
   pack_id_t packnum;
 
   AppGlobals &globals;
@@ -45,8 +45,7 @@ class ManagerWindow : public QWidget {
   QPushButton *edit_card_button;
   QPushButton *remove_card_button;
 
-  QLabel* choosepack_text;
-
+  QLabel *choosepack_text;
 
   QListWidget *card_list;
 
@@ -73,7 +72,6 @@ class ManagerWindow : public QWidget {
 
   /// 删除 database 中的内容;
   void RemovePack();
-
 };
 
 }  // namespace aijika

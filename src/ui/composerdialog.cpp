@@ -1,14 +1,16 @@
 #include "ui/composerdialog.h"
-#include "generator/generator.h"
-#include "generator/prompt.h"
 
-#include <QtDebug>
-#include <QListWidget>
 #include <qapplication.h>
+
+#include <QBoxLayout>
+#include <QListWidget>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QBoxLayout>
+#include <QtDebug>
 #include <iostream>
+
+#include "generator/generator.h"
+#include "generator/prompt.h"
 
 namespace aijika {
 
@@ -22,32 +24,31 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
       generate_button{new QPushButton{"生成", this}},
       cancel_button{new QPushButton{"取消", this}},
       confirm_button{new QPushButton{"确认", this}},
-      leave_button{new QPushButton{"退出",this}},
+      leave_button{new QPushButton{"退出", this}},
 
       Layoutmain{new QVBoxLayout{this}},
-      LayoutH{new QHBoxLayout{nullptr},new QHBoxLayout{nullptr},new QHBoxLayout{nullptr},
-              new QHBoxLayout{nullptr},new QHBoxLayout{nullptr},new QHBoxLayout{nullptr}},
+      LayoutH{new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
+              new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
+              new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr}},
 
       generate_text{new QScrollArea{this}},
 
       generate_list{new QListWidget{generate_text}},
 
-      question_label{new QLabel{"模板:",this}},
-      keywords_label{new QLabel{"关键词:",this}},
-      generate_label{new QLabel{"生成结果：",this}},
-      error_label{new QLabel{"生成出错啦",parent}}
+      question_label{new QLabel{"模板:", this}},
+      keywords_label{new QLabel{"关键词:", this}},
+      generate_label{new QLabel{"生成结果：", this}},
+      error_label{new QLabel{"生成出错啦", parent}}
 
 {
-
   setWindowTitle("创建卡片");
 
-  combo->setFixedSize(120,20);
+  combo->setFixedSize(120, 20);
   combo->addItem(prompts[0].label);
-  generate_text->setFixedSize(300,200);
-  generate_text->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);//滚动条
+  generate_text->setFixedSize(300, 200);
+  generate_text->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);  // 滚动条
   generate_text->setWidget(generate_list);
-  generate_list->setGeometry(0, 0, 300, 1200);//主要是设置长宽，xy意义不大
-
+  generate_list->setGeometry(0, 0, 300, 1200);  // 主要是设置长宽，xy意义不大
 
   LayoutH[1]->addWidget(question_label);
   LayoutH[1]->addWidget(combo);
@@ -66,7 +67,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   LayoutH[3]->setAlignment(Qt::AlignHCenter);
   LayoutH[4]->setAlignment(Qt::AlignHCenter);
   LayoutH[5]->setAlignment(Qt::AlignRight);
-  combo->setFixedSize(150,30);
+  combo->setFixedSize(150, 30);
 
   Layoutmain->addLayout(LayoutH[1]);
   Layoutmain->addLayout(LayoutH[2]);
@@ -74,17 +75,10 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   Layoutmain->addLayout(LayoutH[4]);
   Layoutmain->addLayout(LayoutH[5]);
   error_label->setWindowTitle("error");
-  error_label->setFont (QFont ("Arial", 20));
+  error_label->setFont(QFont("Arial", 20));
   error_label->setAlignment(Qt::AlignCenter);
 
-
-
-
-
-
-          // TODO: unimplemented
-
-
+  // TODO: unimplemented
 
   connect(generator, &CardGenerator::generated, this,
           &ComposerDialog::ShowResults);
@@ -93,30 +87,32 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   connect(generate_button, &QPushButton::clicked, [this]() {
     generator->Generate(prompts[0], keywords_input->toPlainText());
   });
-  connect(cancel_button, &QPushButton::clicked,
-          [this]() { generator->Abort();generate_list->clear();});//点击cancel就清空
-  connect(confirm_button, &QPushButton::clicked,
-          [this]() {
-            QString title;
-            for (auto &card : this->generated_cards) {
-              title+=card.keyword;
-              title+=" ";
-            }
-            qDebug()<<"here0";
-            qDebug()<<generated_cards.size();
-            if(this->generated_cards.size()!=0){
-              this->globals.db.AddPack(title);
-              qDebug()<<"here1";
-              for(auto &card :this->generated_cards){
-                qDebug()<<"1";
-                this->globals.db.AddCard(card,*(this->globals.db.FindPack(this->globals.db.incremental_pack_id - 1)));
-              }
+  connect(cancel_button, &QPushButton::clicked, [this]() {
+    generator->Abort();
+    generate_list->clear();
+  });  // 点击cancel就清空
+  connect(confirm_button, &QPushButton::clicked, [this]() {
+    QString title;
+    for (auto &card : this->generated_cards) {
+      title += card.keyword;
+      title += " ";
+    }
+    qDebug() << "here0";
+    qDebug() << generated_cards.size();
+    if (this->generated_cards.size() != 0) {
+      this->globals.db.AddPack(title);
+      qDebug() << "here1";
+      for (auto &card : this->generated_cards) {
+        qDebug() << "1";
+        this->globals.db.AddCard(
+            card, *(this->globals.db.FindPack(
+                      this->globals.db.incremental_pack_id - 1)));
+      }
 
-              this->close();
-            }
-          });
-  connect(leave_button, &QPushButton::clicked,
-          [this]() { this->close(); });
+      this->close();
+    }
+  });
+  connect(leave_button, &QPushButton::clicked, [this]() { this->close(); });
 }
 
 void ComposerDialog::SetPack(CardPack *pack) {}
@@ -132,21 +128,20 @@ void ComposerDialog::ShowResults(CardStemList cards) {
   for (auto &card : cards) {
     // 将卡片转换成一个字符串.
     auto s = QStringList{"关键词: ",    card.keyword, "\n正面: ",
-          card.question, "\n背面: ",   card.answer}
-                                           .join("");
-      // 将字符串添加到列表.
+                         card.question, "\n背面: ",   card.answer}
+                 .join("");
+    // 将字符串添加到列表.
     generate_list->addItem(s);
   }
 }
 
 void ComposerDialog::ShowError(QString message) {
-     // 清空当前列表中显示的卡片.
+  // 清空当前列表中显示的卡片.
   generated_cards.clear();
 
-   // 用一个 label 显示错误信息
+  // 用一个 label 显示错误信息
   error_label->setText(message);
   error_label->show();
-
 }
 
 }  // namespace aijika
