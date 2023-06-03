@@ -35,6 +35,10 @@ PackCombo::PackCombo(QWidget *parent, AppGlobals &globals)
     connect(&globals.db, &CardDatabase::pack_updated, this, &PackCombo::UpdatePack);
     connect(&globals.db, &CardDatabase::list_updated, this, &PackCombo::UpdateList);
     connect(this, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int index) {
+        if(count()==0){
+            qDebug()<<"error:packcombo is empty!!";
+            return;
+        }
         pack_id_t new_pack_id = itemData(index).toInt();
         if (new_pack_id != pack_id) {
             // 如果选中卡组发生变化，则更新卡组信息
@@ -73,7 +77,7 @@ void PackCombo::SetPack(CardPack *pack) {
         return;
     }//保险，防止调用了没有的pack;
     pack_id=pack->id;
-    setCurrentIndex(index);//比packs多一个null；
+    setCurrentIndex(index);
 }
 
 // 更新卡组信息
@@ -97,6 +101,11 @@ void PackCombo::UpdateList() {
     // 重新设置选中项
     pack_id=globals.db.last_visited_pack;
     int index = findData(static_cast<int>(pack_id));
+    if(index==-1){
+        pack_id=-1;
+        setCurrentIndex(0);
+        return ;
+    }
     setCurrentIndex(index);
 }
 

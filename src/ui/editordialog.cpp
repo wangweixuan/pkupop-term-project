@@ -62,11 +62,14 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
 
   ///在card_list中加入card，以keyword作为索引
   qDebug()<<pack_list->currentIndex();
-  if(pack_list->currentIndex()>=0&&pack_list->currentIndex()<globals.db.incremental_pack_id){
-    card_list->show();
-    card_list->clear();
-    for (auto &cardd : pack_list->GetPack()->cards) {
-        card_list->addItem(cardd.keyword);
+  if(pack_list->GetPack()==nullptr){}
+  else{
+    if(pack_list->currentIndex()>=0&&pack_list->currentIndex()<globals.db.incremental_pack_id){
+        card_list->show();
+        card_list->clear();
+        for (auto &cardd : pack_list->GetPack()->cards) {
+            card_list->addItem(cardd.keyword);
+        }
     }
   }
   connect(pack_list,&PackCombo ::currentIndexChanged,this,&EditorDialog::changecard);

@@ -17,7 +17,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
       globals{globals},
       generator{new CardGenerator{this, globals.settings}},
       prompts{LoadPromptsFromResources()},
-      pack_combo{new PackCombo{this,globals}},
+      combo{new QComboBox{this}},
       keywords_input{new QTextEdit{this}},
       generate_button{new QPushButton{"生成", this}},
       cancel_button{new QPushButton{"取消", this}},
@@ -41,8 +41,8 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
 
   setWindowTitle("创建卡片");
 
-  pack_combo->setFixedSize(120,20);
-  pack_combo->addItem(prompts[0].label);
+  combo->setFixedSize(120,20);
+  combo->addItem(prompts[0].label);
   generate_text->setFixedSize(300,200);
   generate_text->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);//滚动条
   generate_text->setWidget(generate_list);
@@ -50,7 +50,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
 
 
   LayoutH[1]->addWidget(question_label);
-  LayoutH[1]->addWidget(pack_combo);
+  LayoutH[1]->addWidget(combo);
   LayoutH[2]->addWidget(keywords_label);
   LayoutH[2]->addWidget(keywords_input);
   LayoutH[3]->addWidget(generate_button);
@@ -66,7 +66,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   LayoutH[3]->setAlignment(Qt::AlignHCenter);
   LayoutH[4]->setAlignment(Qt::AlignHCenter);
   LayoutH[5]->setAlignment(Qt::AlignRight);
-  pack_combo->setFixedSize(150,30);
+  combo->setFixedSize(150,30);
 
   Layoutmain->addLayout(LayoutH[1]);
   Layoutmain->addLayout(LayoutH[2]);
@@ -91,7 +91,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   connect(generator, &CardGenerator::error, this, &ComposerDialog::ShowError);
 
   connect(generate_button, &QPushButton::clicked, [this]() {
-    generator->Generate(prompts[pack_combo->currentIndex()], keywords_input->toPlainText());
+    generator->Generate(prompts[0], keywords_input->toPlainText());
   });
   connect(cancel_button, &QPushButton::clicked,
           [this]() { generator->Abort();generate_list->clear();});//点击cancel就清空
@@ -102,9 +102,13 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
               title+=card.keyword;
               title+=" ";
             }
+            qDebug()<<"here0";
+            qDebug()<<generated_cards.size();
             if(this->generated_cards.size()!=0){
               this->globals.db.AddPack(title);
+              qDebug()<<"here1";
               for(auto &card :this->generated_cards){
+                qDebug()<<"1";
                 this->globals.db.AddCard(card,*(this->globals.db.FindPack(this->globals.db.incremental_pack_id - 1)));
               }
 
@@ -115,7 +119,7 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
           [this]() { this->close(); });
 }
 
-void ComposerDialog::SetPack(CardPack *pack) { pack_combo->SetPack(pack); }
+void ComposerDialog::SetPack(CardPack *pack) {}
 
 void ComposerDialog::ShowResults(CardStemList cards) {
   // TODO: 用一个列表显示新生成的卡片

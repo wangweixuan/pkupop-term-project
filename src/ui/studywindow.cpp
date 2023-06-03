@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0 */
 
 #include "ui/studywindow.h"
-
+#include "model/card.h"
 #include "ui/managerwindow.h"
 #include "ui/settingswindow.h"
 #include "ui/composerdialog.h"
@@ -103,6 +103,16 @@ namespace aijika {
             Card *tmp=GetCard();
             answer_label->setText(tmp->answer);
         });
+
+        for(int i=0;i<4;i++){
+            connect(quality_buttons[i],&QPushButton::clicked,[this,i](){
+                Card *tmp=GetCard();
+                UserQuality quality = static_cast<UserQuality>(4-i);
+                tmp->Update(UserQuality::easy);
+                emit this->globals.db.card_updated(*tmp);
+                SetPack(pack_combo->GetPack());
+            });
+        }
 
         UpdateAppearance();
 

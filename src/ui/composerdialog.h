@@ -39,7 +39,7 @@ class ComposerDialog : public QDialog {
           /// 生成的卡片列表.
   CardStemList generated_cards;
 
-  PackCombo *pack_combo;
+  QComboBox *combo;
 
           /// 关键词输入框.
   QTextEdit *keywords_input;

@@ -56,11 +56,14 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
     pack_combo->addItem(globals.db.FindPack(i)->label,globals.db.FindPack(i)->id);
   }
   ///在pack_combo中加入pack，以名字作为索引
-  if(pack_combo->currentIndex()>=0&&pack_combo->currentIndex()<globals.db.incremental_pack_id){
-    card_list->show();
-    card_list->clear();
-    for (auto &cardd : pack_combo->GetPack()->cards) {
-      card_list->addItem(cardd.keyword);
+  if(pack_combo->GetPack()==nullptr){}
+  else{
+    if(pack_combo->currentIndex()>=0&&pack_combo->currentIndex()<globals.db.incremental_pack_id){
+        card_list->show();
+        card_list->clear();
+        for (auto &cardd : pack_combo->GetPack()->cards) {
+            card_list->addItem(cardd.keyword);
+        }
     }
   }
   connect(pack_combo,&PackCombo ::currentIndexChanged,this,&ManagerWindow::ChangePack);
@@ -81,7 +84,8 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
   ///删除
   connect(remove_pack_button,&QPushButton::clicked,this,&ManagerWindow::RemovePack);
 
-
+  ///增加卡片
+  //connect(compose_card_button,&QPushButton::clicked,[globals]);
 
   // TODO: layout unimplemented
 }
