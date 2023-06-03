@@ -57,7 +57,7 @@ class AppSettings : public QObject {
 
   /// 根据卡片界面字体、字号、颜色主题, 生成 Qt 样式表.
   /// 见 https://doc.qt.io/qt-6/stylesheet.html
-  QString styleSheet() const;
+  QString StyleSheet() const;
 
   /// 将 settings 序列化到数据流 out.
   friend QDataStream &operator<<(QDataStream &out, AppSettings const &settings);

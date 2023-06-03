@@ -9,6 +9,7 @@ namespace aijika {
 EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
     : QDialog{parent},
       globals{globals},
+      pack_list{new PackCombo{this, globals}},
       choosecard_text{new QLabel{"选择卡片:", this}},
       choosepack_text{new QLabel{"选择卡组", this}},
       keyword_text{new QLabel{"关键词:", this}},
@@ -18,13 +19,10 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
       front_edit{new QTextEdit{this}},
       back_edit{new QTextEdit{this}},
       main_layout{new QVBoxLayout{this}},
-      pack_list{new PackCombo{this, globals}},
-      card_list{new QListWidget{this}},
-      LayoutH{new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
-              new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
-              new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr}}
-
-{
+      hori_layout{new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
+                  new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
+                  new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr}},
+      card_list{new QListWidget{this}} {
   setWindowTitle("编辑卡片");
 
   /// 布局
@@ -34,33 +32,28 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
   back_edit->setFixedHeight(60);
   pack_list->setFixedWidth(300);
   /// 加入布局
-  LayoutH[0]->addWidget(choosepack_text);
-  LayoutH[0]->addWidget(pack_list);
-  LayoutH[1]->addWidget(choosecard_text);
-  LayoutH[1]->addWidget(card_list);
-  LayoutH[2]->addWidget(keyword_text);
-  LayoutH[2]->addWidget(keyword_edit);
-  LayoutH[3]->addWidget(front_text);
-  LayoutH[3]->addWidget(front_edit);
-  LayoutH[4]->addWidget(back_text);
-  LayoutH[4]->addWidget(back_edit);
+  hori_layout[0]->addWidget(choosepack_text);
+  hori_layout[0]->addWidget(pack_list);
+  hori_layout[1]->addWidget(choosecard_text);
+  hori_layout[1]->addWidget(card_list);
+  hori_layout[2]->addWidget(keyword_text);
+  hori_layout[2]->addWidget(keyword_edit);
+  hori_layout[3]->addWidget(front_text);
+  hori_layout[3]->addWidget(front_edit);
+  hori_layout[4]->addWidget(back_text);
+  hori_layout[4]->addWidget(back_edit);
   /// 布局调整
-  LayoutH[1]->setAlignment(Qt::AlignLeft);
-  LayoutH[2]->setAlignment(Qt::AlignLeft);
-  LayoutH[2]->setSpacing(20);
-  LayoutH[3]->setSpacing(30);
-  LayoutH[4]->setSpacing(30);
+  hori_layout[1]->setAlignment(Qt::AlignLeft);
+  hori_layout[2]->setAlignment(Qt::AlignLeft);
+  hori_layout[2]->setSpacing(20);
+  hori_layout[3]->setSpacing(30);
+  hori_layout[4]->setSpacing(30);
 
-  main_layout->addLayout(LayoutH[0]);
-  main_layout->addLayout(LayoutH[1]);
-  main_layout->addLayout(LayoutH[2]);
-  main_layout->addLayout(LayoutH[3]);
-  main_layout->addLayout(LayoutH[4]);
-
-  /// 在pack_list中加入pack，以title显示
-  for (int i = 0; i < globals.db.incremental_pack_id; i++) {
-    pack_list->addItem(globals.db.FindPack(i)->label);
-  }
+  main_layout->addLayout(hori_layout[0]);
+  main_layout->addLayout(hori_layout[1]);
+  main_layout->addLayout(hori_layout[2]);
+  main_layout->addLayout(hori_layout[3]);
+  main_layout->addLayout(hori_layout[4]);
 
   /// 在card_list中加入card，以keyword作为索引
   qDebug() << pack_list->currentIndex();
@@ -75,6 +68,9 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals)
       }
     }
   }
+
+  // TODO: 不确定 editor dialog 是否需要切换卡组的功能
+  // 这里暂未更改
   connect(pack_list, &PackCombo ::currentIndexChanged, this,
           &EditorDialog::changecard);
 
@@ -91,6 +87,7 @@ void EditorDialog::SetPack(CardPack &pack) {
   // TODO: unimplemented
   (void)pack;
 }
+
 void EditorDialog::changecard() {
   qDebug() << pack_list->currentIndex();
   card_list->show();

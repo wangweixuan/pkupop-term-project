@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <QComboBox>
 #include <QDialog>
 #include <QLabel>
 #include <QLayout>
@@ -18,7 +19,6 @@
 #include "common/globals.h"
 #include "generator/generator.h"
 #include "generator/prompt.h"
-#include "model/pack.h"
 #include "ui/components/packcombo.h"
 
 namespace aijika {
@@ -39,7 +39,11 @@ class ComposerDialog : public QDialog {
   /// 生成的卡片列表.
   CardStemList generated_cards;
 
-  QComboBox *combo;
+  /// 卡组选择框.
+  PackCombo *pack_combo;
+
+  /// 模板选择框.
+  QComboBox *prompt_combo;
 
   /// 关键词输入框.
   QTextEdit *keywords_input;
@@ -54,10 +58,10 @@ class ComposerDialog : public QDialog {
   QPushButton *leave_button;
 
   /// 布局
-  QVBoxLayout *Layoutmain;
-  QHBoxLayout *LayoutH[6];
+  QVBoxLayout *main_layout;
+  QHBoxLayout *hori_layout[6];
 
-  /// 生成文本,滚动界面
+  /// 生成文本, 滚动界面
   QScrollArea *generate_text;
 
   /// 生成界面
@@ -72,10 +76,12 @@ class ComposerDialog : public QDialog {
  public:
   explicit ComposerDialog(QWidget *parent, AppGlobals &globals);
 
-  void SetPack(CardPack *pack);
+ private slots:
+  void Generate();
 
- signals:
-  void updatepack();
+  void Cancel();
+
+  void Confirm();
 
  public slots:
   /// 接收 CardGenerator 的信号, 表示卡片生成完成.

@@ -56,7 +56,7 @@ constexpr char const *k_colors[4]{/* white */
                                   "#bebebe"};
 }  // namespace predefined_styles
 
-QString AppSettings::styleSheet() const {
+QString AppSettings::StyleSheet() const {
   using namespace predefined_styles;
 
   QStringList parts{"QFrame { font-family:",

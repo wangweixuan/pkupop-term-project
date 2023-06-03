@@ -42,7 +42,7 @@ class EditorDialog : public QDialog {
   QTextEdit *back_edit;
 
   QVBoxLayout *main_layout;
-  QHBoxLayout *LayoutH[6];
+  QHBoxLayout *hori_layout[6];
 
   /// 卡组的列表
   QListWidget *card_list;
@@ -59,6 +59,7 @@ class EditorDialog : public QDialog {
   void SetCard(Card &card);
 
   void SetPack(CardPack &pack);
+
  public slots:
   void changecard();
 };

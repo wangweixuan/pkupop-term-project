@@ -18,10 +18,11 @@ class PackCombo : public QComboBox {
  private:
   AppGlobals &globals;
 
-  pack_id_t pack_id;
-
  public:
   explicit PackCombo(QWidget *parent, AppGlobals &globals);
+
+  /// 设置卡组列表.
+  void SetList();
 
   /// 获取所选卡组. 没有卡组时, 返回 nullptr.
   CardPack *GetPack();
@@ -35,6 +36,9 @@ class PackCombo : public QComboBox {
 
   /// 接收 CardDatabase 的信号, 更新卡组列表.
   void UpdateList();
+
+  /// 接收 QComboBox 的信号, 切换卡组.
+  void ChangeIndex(int index);
 
  signals:
   /// 切换卡组时发出的信号. pack 可为 nullptr.

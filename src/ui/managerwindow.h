@@ -33,7 +33,7 @@ class ManagerWindow : public QWidget {
   QHBoxLayout *top_layout;
   QVBoxLayout *pack_toolbar_layout;
   QPushButton *add_pack_button;
-  QPushButton *edit_pack_button;
+  QPushButton *rename_pack_button;
   QPushButton *remove_pack_button;
   QPushButton *export_pack_button;
   QPushButton *import_pack_button;
@@ -57,6 +57,19 @@ class ManagerWindow : public QWidget {
   /// pack 应匹配当前 pack_combo 所选的卡组, 或为 nullptr.
   void SetPack(CardPack *pack);
 
+ private slots:
+  /// 添加卡组.
+  void AddPack();
+
+  /// 重命名卡组.
+  void RenamePack();
+
+  /// 删除卡组.
+  void RemovePack();
+
+  /// 接收 QListWidget 的信号, 切换所选卡片.
+  void ChangeItem(QListWidgetItem *item);
+
  public slots:
   /// 接收 CardDatabase 的信号, 更新卡片信息.
   /// 只在 card 为当前列表中的卡片时有效.
@@ -64,14 +77,11 @@ class ManagerWindow : public QWidget {
 
   /// 接收 PackCombo 的信号, 切换所选卡组.
   /// 另见 SetPack().
-  void ChangePack();
+  void ChangePack(CardPack *pack);
 
   /// 接收 PackCombo 的信号, 更新卡组信息.
   /// 另见 SetPack().
-  void UpdatePack();
-
-  /// 删除 database 中的内容;
-  void RemovePack();
+  void UpdatePack(CardPack &pack);
 };
 
 }  // namespace aijika
