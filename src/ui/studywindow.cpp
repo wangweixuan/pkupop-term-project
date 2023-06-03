@@ -112,6 +112,10 @@ namespace aijika {
 
     ///model中没有合适的实现方法，这里需要遍历整个database!!!
     Card *StudyWindow::GetCard(){
+        if(card_id==-1){
+            qDebug()<<"id=-1";
+            return nullptr;
+        }
         for( CardPack &pack : globals.db.packs){
             for( Card &card : pack.cards){
                 if(card.id==card_id){
@@ -138,18 +142,9 @@ namespace aijika {
         question_label->setText(card->question);
         answer_label->setText("");
         show_answer_button->setEnabled(true);
+        card_id=card->id;
 
         qDebug()<<card->answer;
-
-
-        // 更新底部状态栏
-        int review_count = 1;
-        QString review_text = review_count == 1 ? "还有 1 张卡片要复习" :
-        QString{"还有 %1 张卡片要复习"}.arg(review_count);
-        statusbar_label->setText(review_text);
-
-        // 更新卡片 ID
-        card_id = card->id;
         }
 
     void StudyWindow::SetPack(CardPack *pack) {
@@ -160,7 +155,7 @@ namespace aijika {
         return;
         }
         //SetCard(pack->ChooseCard(ReviewOption::random));
-        SetCard(&pack->cards[0]);
+        SetCard(pack->ChooseCard(ReviewOption::random));
         int review_count = pack->CountCards(ReviewOption::random);
         QString review_text = review_count == 1 ? "还有 1 张卡片要复习" :
         QString{"还有 %1 张卡片要复习"}.arg(review_count);
@@ -169,77 +164,77 @@ namespace aijika {
     }
 
     void StudyWindow::UpdateAppearance() {
-        // 获取当前的程序设置
-        globals.RestoreSettings();
-        const AppSettings &settings = globals.settings;
+//        // 获取当前的程序设置
+//        globals.RestoreSettings();
+//        const AppSettings &settings = globals.settings;
 
-        // 更新卡片界面字体和字号
-        QFont font;
-        switch (settings.font_family) {
-        case PredefinedFont::old_style:
-        font = QFont("Times", settings.font_size);
-        break;
-        case PredefinedFont::transitional:
-        font = QFont("Cambria", settings.font_size);
-        break;
-        case PredefinedFont::neo_grotesk:
-        font = QFont("Helvetica Neue", settings.font_size);
-        break;
-        case PredefinedFont::geometric:
-        font = QFont("Roboto", settings.font_size);
-        break;
-        case PredefinedFont::humanistic:
-        default:
-        font = QFont("Fira Sans", settings.font_size);
-        break;
-        }
-        question_label->setFont(font);
-        answer_label->setFont(font);
+//        // 更新卡片界面字体和字号
+//        QFont font;
+//        switch (settings.font_family) {
+//        case PredefinedFont::old_style:
+//        font = QFont("Times", settings.font_size);
+//        break;
+//        case PredefinedFont::transitional:
+//        font = QFont("Cambria", settings.font_size);
+//        break;
+//        case PredefinedFont::neo_grotesk:
+//        font = QFont("Helvetica Neue", settings.font_size);
+//        break;
+//        case PredefinedFont::geometric:
+//        font = QFont("Roboto", settings.font_size);
+//        break;
+//        case PredefinedFont::humanistic:
+//        default:
+//        font = QFont("Fira Sans", settings.font_size);
+//        break;
+//        }
+//        question_label->setFont(font);
+//        answer_label->setFont(font);
 
-        // 更新卡片界面颜色主题
-        QString theme_name;
-        switch (settings.theme) {
-        case PredefinedTheme::white:
-        theme_name = "white";
-        break;
-        case PredefinedTheme::yellow:
-        theme_name = "yellow";
-        break;
-        case PredefinedTheme::grey:
-        theme_name = "grey";
-        break;
-        case PredefinedTheme::black:
-        default:
-        theme_name = "black";
-        break;
-        }
-        card_widget->setStyleSheet(QString("#card_widget { background-color: %1; }").arg(theme_name));
+//        // 更新卡片界面颜色主题
+//        QString theme_name;
+//        switch (settings.theme) {
+//        case PredefinedTheme::white:
+//        theme_name = "white";
+//        break;
+//        case PredefinedTheme::yellow:
+//        theme_name = "yellow";
+//        break;
+//        case PredefinedTheme::grey:
+//        theme_name = "grey";
+//        break;
+//        case PredefinedTheme::black:
+//        default:
+//        theme_name = "black";
+//        break;
+//        }
+//        card_widget->setStyleSheet(QString("#card_widget { background-color: %1; }").arg(theme_name));
 
-        // 更新界面其他组件的样式
-        QString button_style = QString(
-                                   "QPushButton { border-radius: 4px; padding: 6px 10px; font-size: %1px; }"
-                                   "QPushButton:hover { background-color: rgba(255, 255, 255, 0.2); }"
-                                   "QPushButton:pressed { background-color: rgba(0, 0, 0, 0.1); }")
-                                   .arg(settings.font_size);
-        QString combo_style = QString(
-                                  "QComboBox { border: none; border-radius: 4px; padding: 4px 10px; font-size: %1px; }"
-                                  "QComboBox:hover { background-color: rgba(255, 255, 255, 0.2); }"
-                                  "QComboBox:pressed { background-color: rgba(0, 0, 0, 0.1); }")
-                                  .arg(settings.font_size);
-        pack_combo->setStyleSheet(combo_style);
-        compose_button->setStyleSheet(button_style);
-        edit_button->setStyleSheet(button_style);
-        manage_button->setStyleSheet(button_style);
-        settings_button->setStyleSheet(button_style);
-        for (int i = 0; i < 4; i++) {
-        quality_buttons[i]->setStyleSheet(QString(
-                                              "QPushButton { border: none; border-radius: 32px; width: 64px; height: 64px; font-size: "
-                                              "%1px; } QPushButton:checked { background-color: rgba(255, 255, 255, 0.2); } QPushButton:"
-                                              "hover:!checked { background-color: rgba(255, 255, 255, 0.1); } QPushButton:checked:hover"
-                                              " { background-color: rgba(255, 255, 255, 0.3); } QPushButton:pressed { border-width: "
-                                              "2px; }")
-                                              .arg(settings.font_size));
-        }
+//        // 更新界面其他组件的样式
+//        QString button_style = QString(
+//                                   "QPushButton { border-radius: 4px; padding: 6px 10px; font-size: %1px; }"
+//                                   "QPushButton:hover { background-color: rgba(255, 255, 255, 0.2); }"
+//                                   "QPushButton:pressed { background-color: rgba(0, 0, 0, 0.1); }")
+//                                   .arg(settings.font_size);
+//        QString combo_style = QString(
+//                                  "QComboBox { border: none; border-radius: 4px; padding: 4px 10px; font-size: %1px; }"
+//                                  "QComboBox:hover { background-color: rgba(255, 255, 255, 0.2); }"
+//                                  "QComboBox:pressed { background-color: rgba(0, 0, 0, 0.1); }")
+//                                  .arg(settings.font_size);
+//        pack_combo->setStyleSheet(combo_style);
+//        compose_button->setStyleSheet(button_style);
+//        edit_button->setStyleSheet(button_style);
+//        manage_button->setStyleSheet(button_style);
+//        settings_button->setStyleSheet(button_style);
+//        for (int i = 0; i < 4; i++) {
+//        quality_buttons[i]->setStyleSheet(QString(
+//                                              "QPushButton { border: none; border-radius: 32px; width: 64px; height: 64px; font-size: "
+//                                              "%1px; } QPushButton:checked { background-color: rgba(255, 255, 255, 0.2); } QPushButton:"
+//                                              "hover:!checked { background-color: rgba(255, 255, 255, 0.1); } QPushButton:checked:hover"
+//                                              " { background-color: rgba(255, 255, 255, 0.3); } QPushButton:pressed { border-width: "
+//                                              "2px; }")
+//                                              .arg(settings.font_size));
+//        }
     }
 
 
@@ -247,10 +242,7 @@ namespace aijika {
         if (card.id != card_id) return;
         // TODO: unimplemented
         // 更新底部状态栏
-        int review_count = 1;
-        QString review_text = review_count == 1 ? "还有 1 张卡片要复习" :
-        QString{"还有 %1 张卡片要复习"}.arg(review_count);
-        statusbar_label->setText(review_text);
+        SetCard(&card);
     }
 
     void StudyWindow::ChangePack(CardPack *pack) {
