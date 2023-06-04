@@ -30,6 +30,9 @@ class PackCombo : public QComboBox {
   /// 设置所选卡组. pack 可为 nullptr.
   void SetPack(CardPack *pack);
 
+  /// 设置 CardDatabase 中的上次访问卡组.
+  void SetLastVisited();
+
  private slots:
   /// 接收 CardDatabase 的信号, 更新卡组信息.
   void UpdatePack(CardPack &pack);

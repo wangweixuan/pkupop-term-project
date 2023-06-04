@@ -4,7 +4,7 @@
 
 #include "ui/editordialog.h"
 
-#include "generator/generator.h"
+#include <QMessageBox>
 
 namespace aijika {
 
@@ -12,74 +12,70 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals, Card *card,
                            CardPack *pack)
     : QDialog{parent},
       globals{globals},
-      card_id(card->id),
-      pack_id(pack->id),
-      keyword_text{new QLabel{"关键词:", this}},
-      front_text{new QLabel{"正面:", this}},
-      back_text{new QLabel{"反面:", this}},
-      keyword_edit{new QTextEdit{this}},
+      card_id{card->id},
+      pack_id{pack->id},
+      main_layout{new QFormLayout{this}},
+      keyword_edit{new QLineEdit{this}},
       front_edit{new QTextEdit{this}},
       back_edit{new QTextEdit{this}},
-      main_layout{new QVBoxLayout{this}},
-      hori_layout{new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
-                  new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr},
-                  new QHBoxLayout{nullptr}, new QHBoxLayout{nullptr}},
+      repetition_label{new QLabel{this}},
+      time_created_label{new QLabel{this}},
+      time_reviewed_label{new QLabel{this}},
+      time_due_label{new QLabel{this}},
+      button_layout{new QHBoxLayout{nullptr}},
       save_button{new QPushButton{"保存", this}},
       cancel_button{new QPushButton{"取消", this}} {
   setWindowTitle("编辑卡片");
 
-  /// 布局
-  /// 大小调整
-  keyword_edit->setFixedHeight(40);
-  front_edit->setFixedHeight(60);
-  back_edit->setFixedHeight(60);
-  /// 加入布局
-  hori_layout[0]->addWidget(keyword_text);
-  hori_layout[0]->addWidget(keyword_edit);
-  hori_layout[1]->addWidget(front_text);
-  hori_layout[1]->addWidget(front_edit);
-  hori_layout[2]->addWidget(back_text);
-  hori_layout[2]->addWidget(back_edit);
-  hori_layout[3]->addWidget(save_button);
-  hori_layout[3]->addWidget(cancel_button);
-  /// 布局调整
+  // 布局
+  main_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+  main_layout->setFormAlignment(Qt::AlignLeft);
+  main_layout->setLabelAlignment(Qt::AlignRight);
 
-  hori_layout[0]->setAlignment(Qt::AlignLeft);
-  hori_layout[0]->setSpacing(20);
-  hori_layout[1]->setSpacing(30);
-  hori_layout[2]->setSpacing(30);
+  main_layout->addRow("关键词：", keyword_edit);
+  main_layout->addRow("正面：", front_edit);
+  main_layout->addRow("背面：", back_edit);
+  main_layout->addRow("复习次数：", repetition_label);
+  main_layout->addRow("创建时间：", time_created_label);
+  main_layout->addRow("最近复习：", time_reviewed_label);
+  main_layout->addRow("下次复习：", time_due_label);
 
-  main_layout->addLayout(hori_layout[0]);
-  main_layout->addLayout(hori_layout[1]);
-  main_layout->addLayout(hori_layout[2]);
-  main_layout->addLayout(hori_layout[3]);
-  main_layout->addLayout(hori_layout[4]);
+  button_layout->addWidget(save_button);
+  button_layout->addWidget(cancel_button);
+  main_layout->addRow(" ", button_layout);
+
+  QString date_format{"yyyy 年 M 月 d 日 h:mm"};
   keyword_edit->setText(card->keyword);
-  front_edit->setText(card->question);
-  back_edit->setText(card->answer);
+  front_edit->setPlainText(card->question);
+  back_edit->setPlainText(card->answer);
+  repetition_label->setText(QString::number(card->repetition));
+  time_created_label->setText(card->time_created.toString(date_format));
+  time_reviewed_label->setText(card->time_reviewed.toString(date_format));
+  time_due_label->setText(card->time_due.toString(date_format));
 
-  connect(save_button, &QPushButton::clicked, this,
-          [&globals, this, card, pack]() {
-            CardStem stem;
-            stem.keyword = keyword_edit->toPlainText();
-            stem.question = front_edit->toPlainText();
-            stem.answer = back_edit->toPlainText();
-            globals.db.editcard(stem, card, *pack);
-            this->close();
-          });
+  connect(save_button, &QPushButton::clicked, this, &EditorDialog::Save);
   connect(cancel_button, &QPushButton::clicked, this, &EditorDialog::close);
-  // TODO: layout unimplemented
 }
 
-void EditorDialog::SetCard(Card &card) {
-  // TODO: unimplemented
+void EditorDialog::Save() {
+  auto pack = globals.db.FindPack(pack_id);
+  if (pack == nullptr) {
+    QMessageBox::information(this, "编辑卡片", "卡组已删除。");
+    close();
+    return;
+  }
+  auto card = pack->FindCard(card_id);
+  if (card == nullptr) {
+    QMessageBox::information(this, "编辑卡片", "卡片已删除。");
+    close();
+    return;
+  }
 
-  (void)card;
-}
-
-void EditorDialog::SetPack(CardPack &pack) {
-  // TODO: unimplemented
-  (void)pack;
+  CardStem stem{.keyword = keyword_edit->text(),
+                .question = front_edit->toPlainText(),
+                .answer = back_edit->toPlainText()};
+  globals.db.EditCard(stem, *card);
+  close();
 }
 
 }  // namespace aijika

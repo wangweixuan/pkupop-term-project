@@ -46,11 +46,9 @@ void CardDatabase::AddCard(CardStem const &stem, CardPack &pack) {
   emit pack_updated(pack);
 }
 
-void CardDatabase::editcard(CardStem const &stem, Card *card, CardPack &pack) {
-  Card card1(stem);
-  card1.id = card->id;
-  *card = card1;
-  emit pack_updated(pack);
+void CardDatabase::EditCard(CardStem const &stem, Card &card) {
+  card = stem;
+  emit card_updated(card);
 }
 
 void CardDatabase::RemoveCard(card_id_t card, CardPack &pack) {

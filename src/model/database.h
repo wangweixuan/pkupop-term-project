@@ -47,8 +47,8 @@ class CardDatabase : public QObject {
   /// 在指定的卡组中, 创建以 stem 为内容的卡片.
   void AddCard(CardStem const &stem, CardPack &pack);
 
-  /// 在指定的卡组中，重新编辑卡片
-  void editcard(CardStem const &stem, Card *card, CardPack &pack);
+  /// 编辑卡片.
+  void EditCard(CardStem const &stem, Card &card);
 
   /// 在指定的卡组中, 移除指定的卡片.
   void RemoveCard(card_id_t card, CardPack &pack);

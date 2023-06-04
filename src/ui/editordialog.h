@@ -5,8 +5,10 @@
 #pragma once
 
 #include <QDialog>
+#include <QFormLayout>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
 #include <QTextEdit>
@@ -15,7 +17,6 @@
 #include "common/globals.h"
 #include "model/card.h"
 #include "model/pack.h"
-#include "ui/components/packcombo.h"
 
 namespace aijika {
 
@@ -31,20 +32,20 @@ class EditorDialog : public QDialog {
 
   /// 卡组选择，关键词，正面，背面编辑框
 
-  QLabel *keyword_text;
-  QLabel *front_text;
-  QLabel *back_text;
+  QFormLayout *main_layout;
 
-  QTextEdit *keyword_edit;
+  QLineEdit *keyword_edit;
   QTextEdit *front_edit;
   QTextEdit *back_edit;
 
-  QVBoxLayout *main_layout;
-  QHBoxLayout *hori_layout[6];
+  QLabel *repetition_label;
+  QLabel *time_created_label;
+  QLabel *time_reviewed_label;
+  QLabel *time_due_label;
 
+  QHBoxLayout *button_layout;
   /// 保存按钮
   QPushButton *save_button;
-
   /// 取消按钮
   QPushButton *cancel_button;
 
@@ -52,10 +53,8 @@ class EditorDialog : public QDialog {
   explicit EditorDialog(QWidget *parent, AppGlobals &globals, Card *card,
                         CardPack *pack);
 
- public slots:
-  void SetCard(Card &card);
-
-  void SetPack(CardPack &pack);
+ private slots:
+  void Save();
 };
 
 }  // namespace aijika

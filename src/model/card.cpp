@@ -8,6 +8,11 @@
 
 namespace aijika {
 
+QString CardStem::Contents() const {
+  return QString{"关键词：%1\n正面：%2\n背面：%3"}.arg(keyword, question,
+                                                       answer);
+}
+
 Card::Card()
     : id(-1),
       keyword(""),
@@ -31,6 +36,18 @@ Card::Card(CardStem const &stem)
       repetition(0),
       interval(0),
       easiness(2.5) {}
+
+Card &Card::operator=(CardStem const &stem) {
+  keyword = stem.keyword;
+  question = stem.question;
+  answer = stem.answer;
+  return *this;
+}
+
+QString Card::Contents() const {
+  return QString{"关键词：%1\n正面：%2\n背面：%3"}.arg(keyword, question,
+                                                       answer);
+}
 
 void Card::Update(UserQuality qualityy) {
   int quality = int(qualityy);

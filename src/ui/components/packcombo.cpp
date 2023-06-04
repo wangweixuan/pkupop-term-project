@@ -14,12 +14,7 @@ namespace aijika {
 PackCombo::PackCombo(QWidget *parent, AppGlobals &globals)
     : QComboBox(parent), globals(globals) {
   // 设置QComboBox属性
-  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  setStyleSheet(
-      "QComboBox::drop-down {border: none; background-color: transparent; "
-      "image:url(:/resources/icon.icns); width: 20px;} "  // 这里需要一个向下箭头的icon
-      "QComboBox::down-arrow {image: none;}");
-  setToolTip(tr("选择卡组"));
+  setToolTip("选择卡组");
 
   connect(&globals.db, &CardDatabase::pack_updated, this,
           &PackCombo::UpdatePack);
@@ -28,14 +23,20 @@ PackCombo::PackCombo(QWidget *parent, AppGlobals &globals)
   connect(this, &QComboBox::currentIndexChanged, this, &PackCombo::ChangeIndex);
 
   SetList();
-  setCurrentIndex(0);
+
+  int index = findData(globals.db.last_visited_pack);
+  if (index == -1) {
+    setCurrentIndex(0);
+    return;
+  }
+  setCurrentIndex(index);
 }
 
 void PackCombo::SetList() {
   clear();
 
   // 添加无卡组选项
-  addItem(tr("(无卡组)"), -1);
+  addItem("(无卡组)", -1);
 
   // 将所有卡组加入QComboBox
   for (auto const &pack : globals.db.packs) {
@@ -47,7 +48,6 @@ void PackCombo::SetList() {
 CardPack *PackCombo::GetPack() {
   pack_id_t pack_id = currentIndex() == -1 ? -1 : currentData().toInt();
 
-  qDebug() << "PackCombo GetPack: pack_id=" << pack_id;
   if (pack_id == -1) {
     return nullptr;
   }
@@ -69,6 +69,10 @@ void PackCombo::SetPack(CardPack *pack) {
   setCurrentIndex(index);
 }
 
+void PackCombo::SetLastVisited() {
+  globals.db.last_visited_pack = currentData().toInt();
+}
+
 // 更新卡组信息
 void PackCombo::UpdatePack(CardPack &pack) {
   int index = findData(pack.id);
@@ -80,7 +84,6 @@ void PackCombo::UpdatePack(CardPack &pack) {
   setItemText(index, pack.label);
 
   if (index == currentIndex()) {
-    qDebug() << "PackCombo UpdatePack: pack_updated信号发出";
     emit pack_updated(pack);
   }
 }
@@ -106,8 +109,6 @@ void PackCombo::ChangeIndex(int index) {
   // 如果选中卡组发生变化，则更新卡组信息
   CardPack *new_pack =
       (new_pack_id == -1) ? nullptr : globals.db.FindPack(new_pack_id);
-  qDebug() << "PackCombo ChangeIndex: pack_changed信号发出" << new_pack_id
-           << count();
   emit pack_changed(new_pack);
 }
 

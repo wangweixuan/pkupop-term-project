@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0 */
 #include "ui/studywindow.h"
 
-#include <QMessageBox>
+#include <QtDebug>
 
 #include "model/card.h"
 #include "ui/composerdialog.h"
@@ -46,24 +46,27 @@ StudyWindow::StudyWindow(AppGlobals &globals)
   toolbar_layout->addWidget(pack_combo);
 
   toolbar_layout->addWidget(compose_button);
-  connect(compose_button, &QPushButton::clicked, [this, &globals]() {
+  connect(compose_button, &QPushButton::clicked, [&]() {
+    pack_combo->SetLastVisited();
     auto window = new ComposerDialog{this, globals};
     window->show();
   });
 
+  toolbar_layout->addWidget(manage_button);
+  connect(manage_button, &QPushButton::clicked, [&]() {
+    pack_combo->SetLastVisited();
+    auto window = new ManagerWindow{globals};
+    window->show();
+  });
+
   toolbar_layout->addWidget(edit_button);
-  connect(edit_button, &QPushButton::clicked, [this, &globals]() {
+  connect(edit_button, &QPushButton::clicked, [&]() {
     if (GetCard() == nullptr) {
-      QMessageBox::information(this, "编辑卡片", "请选择卡片.");
+      qWarning() << "StudyWindow EditButton: no card";
       return;
     }
     auto window =
         new EditorDialog{0, globals, GetCard(), pack_combo->GetPack()};
-    window->show();
-  });
-  toolbar_layout->addWidget(manage_button);
-  connect(manage_button, &QPushButton::clicked, [&globals]() {
-    auto window = new ManagerWindow{globals};
     window->show();
   });
 
@@ -78,19 +81,19 @@ StudyWindow::StudyWindow(AppGlobals &globals)
   card_splitter->setChildrenCollapsible(false);
   card_splitter->setHandleWidth(3);
 
-  question_area->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  question_area->setAlignment(Qt::AlignCenter);
   question_area->setWidgetResizable(true);
   question_area->setWidget(question_label);
-  question_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  question_label->setAlignment(Qt::AlignCenter);
   question_label->setTextFormat(Qt::MarkdownText);
   question_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
   question_label->setCursor(Qt::IBeamCursor);
   question_label->setWordWrap(true);
 
-  answer_area->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  answer_area->setAlignment(Qt::AlignCenter);
   answer_area->setWidgetResizable(true);
   answer_area->setWidget(answer_label);
-  answer_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  answer_label->setAlignment(Qt::AlignCenter);
   answer_label->setTextFormat(Qt::MarkdownText);
   answer_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
   answer_label->setCursor(Qt::IBeamCursor);
@@ -166,6 +169,7 @@ void StudyWindow::SetCard(Card *card) {
     card_id = -1;
     question_label->setText("无卡片");
     answer_label->setText("No card");
+    edit_button->setEnabled(false);
     for (auto &button : quality_buttons) {
       button->setEnabled(false);
     }
@@ -176,6 +180,7 @@ void StudyWindow::SetCard(Card *card) {
   card_id = card->id;
   question_label->setText(card->question);
   answer_label->setText(card->answer);
+  edit_button->setEnabled(true);
   for (auto &button : quality_buttons) {
     button->setEnabled(true);
   }

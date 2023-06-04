@@ -6,9 +6,9 @@
 
 #include <QInputDialog>
 #include <QListWidgetItem>
-#include <QMessageBox>
 #include <QtDebug>
 
+#include "model/card.h"
 #include "model/database.h"
 #include "ui/components/packcombo.h"
 #include "ui/composerdialog.h"
@@ -21,34 +21,37 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
       globals{globals},
       main_layout{new QVBoxLayout{this}},
       top_layout{new QHBoxLayout{nullptr}},
-      pack_toolbar_layout{new QVBoxLayout{nullptr}},
-      add_pack_button{new QPushButton{"添加卡组", this}},
+      choosepack_text{new QLabel{"卡组：", this}},
+      pack_combo{new PackCombo{this, globals}},
+      add_pack_button{new QPushButton{"添加", this}},
+      pack_toolbar_layout{new QHBoxLayout{nullptr}},
       rename_pack_button{new QPushButton{"重命名", this}},
       remove_pack_button{new QPushButton{"删除卡组", this}},
-      pack_combo{new PackCombo{this, globals}},
-      card_toolbar_layout{new QHBoxLayout{nullptr}},
-      compose_card_button{new QPushButton{"创建卡片", this}},
       // export_pack_button{new QPushButton{" ",this}},
       // import_pack_button{new QPushButton{" ",this}},
-
+      card_list{new QListWidget{this}},
+      details_check{new QCheckBox{"显示详细信息", this}},
+      card_toolbar_layout{new QHBoxLayout{nullptr}},
+      compose_card_button{new QPushButton{"创建卡片", this}},
       edit_card_button{new QPushButton{"编辑卡片", this}},
-      remove_card_button{new QPushButton{"删除卡片", this}},
-      choosepack_text{new QLabel{"选择卡组", this}},
-      card_list{new QListWidget{this}} {
+      remove_card_button{new QPushButton{"删除卡片", this}} {
   setWindowTitle("管理卡片");
-  pack_toolbar_layout->addWidget(add_pack_button);
-  pack_toolbar_layout->addWidget(rename_pack_button);
-  pack_toolbar_layout->addWidget(remove_pack_button);
   top_layout->addWidget(choosepack_text);
   top_layout->addWidget(pack_combo);
-  top_layout->addLayout(pack_toolbar_layout);
+  top_layout->addWidget(add_pack_button);
+  pack_toolbar_layout->addWidget(rename_pack_button);
+  pack_toolbar_layout->addWidget(remove_pack_button);
+
+  pack_combo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   card_toolbar_layout->addWidget(compose_card_button);
   card_toolbar_layout->addWidget(edit_card_button);
   card_toolbar_layout->addWidget(remove_card_button);
 
   main_layout->addLayout(top_layout);
+  main_layout->addLayout(pack_toolbar_layout);
   main_layout->addWidget(card_list);
+  main_layout->addWidget(details_check);
   main_layout->addLayout(card_toolbar_layout);
 
   connect(&globals.db, &CardDatabase::card_updated, this,
@@ -65,66 +68,85 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
   connect(remove_pack_button, &QPushButton::clicked, this,
           &ManagerWindow::RemovePack);
 
+  connect(details_check, &QCheckBox::stateChanged, this,
+          &ManagerWindow::ChangePack);
   connect(card_list, &QListWidget::currentItemChanged, this,
           &ManagerWindow::ChangeItem);
-  connect(compose_card_button, &QPushButton::clicked, this, [&globals]() {
-    auto dialog = new ComposerDialog{0, globals};
+  connect(compose_card_button, &QPushButton::clicked, this, [&]() {
+    pack_combo->SetLastVisited();
+    auto dialog = new ComposerDialog{this, globals};
     dialog->show();
   });
-  connect(edit_card_button, &QPushButton::clicked, this, [&globals, this]() {
-    if (card_list->currentItem() == NULL) {
-      QMessageBox::information(this, "编辑卡片", "请选择卡片.");
+  connect(edit_card_button, &QPushButton::clicked, this, [&]() {
+    auto card = GetCard();
+    if (card == nullptr) {
+      qWarning() << "ManagerWindow EditCard: no card";
       return;
     }
-    int cardid = card_list->currentItem()->data(0).toInt();
-    auto dialog =
-        new EditorDialog{0, globals, pack_combo->GetPack()->FindCard(cardid),
-                         pack_combo->GetPack()};
+    auto dialog = new EditorDialog{this, globals, card, pack_combo->GetPack()};
     dialog->show();
   });
-  connect(remove_card_button, &QPushButton::clicked, this, [&globals, this]() {
-    if (card_list->currentItem() == NULL) {
-      QMessageBox::information(this, "删除卡片", "请选择卡片.");
+  connect(remove_card_button, &QPushButton::clicked, this, [&]() {
+    auto card = GetCard();
+    if (card == nullptr) {
+      qWarning() << "ManagerWindow RemoveCard: no card";
       return;
     }
-    globals.db.RemoveCard(card_list->currentItem()->data(0).toInt(),
-                          *pack_combo->GetPack());
+    globals.db.RemoveCard(card->id, *pack_combo->GetPack());
   });
+
+  ChangePack();
   ChangeItem(nullptr);
-  // TODO: 实现编辑卡片
-  // connect(compose_card_button,&QPushButton::clicked,[globals]);
 }
 
-void ManagerWindow::SetPack(CardPack *pack) {
+void ManagerWindow::ChangePack() {
+  auto pack = pack_combo->GetPack();
+
   card_list->clear();
   if (pack == nullptr) {
+    rename_pack_button->setEnabled(false);
+    remove_pack_button->setEnabled(false);
     return;
   }
 
+  bool details = details_check->isChecked();
+  rename_pack_button->setEnabled(true);
+  remove_pack_button->setEnabled(true);
   for (auto &card : pack->cards) {
-    // TODO: 给 item 绑定 data (即 card.id), 这样就能知道当前选择的卡片了
-    QListWidgetItem *item = new QListWidgetItem(card.keyword, card_list);
-    item->setData(0, card.id);
+    auto text = details ? card.Contents() : card.keyword;
+    QListWidgetItem *item = new QListWidgetItem(text, card_list);
+    item->setData(QListWidgetItem::UserType, card.id);
     card_list->addItem(item);
   }
 }
 
-void ManagerWindow::UpdateCard(Card &card) {
-  // TODO: unimplemented
-  (void)card;
+Card *ManagerWindow::GetCard() {
+  auto item = card_list->currentItem();
+  auto pack = pack_combo->GetPack();
+  if (item == nullptr || pack == nullptr) {
+    return nullptr;
+  }
+  int card_id = item->data(QListWidgetItem::UserType).toInt();
+  return pack->FindCard(card_id);
 }
 
-void ManagerWindow::ChangePack(CardPack *pack) { SetPack(pack); }
+void ManagerWindow::UpdateCard(Card &card) {
+  (void)card;
+  UpdatePack(*pack_combo->GetPack());
+}
 
 void ManagerWindow::UpdatePack(CardPack &pack) {
-  // TODO: 记录当前选中的 card, 并在刷新列表后尝试选中原来的 card
-  SetPack(&pack);
+  (void)pack;
+  int old_row = card_list->currentRow();
+  ChangePack();
+  card_list->setCurrentRow(old_row);
 }
 
 void ManagerWindow::AddPack() {
-  // TODO: 用对话框实现添加卡组.
-  QString text =
-      QInputDialog::getText(this, "packname_input", "请输入新创建卡组名称:");
+  bool is_ok;
+  QString text = QInputDialog::getText(this, "添加卡组", "请输入新卡组名称：",
+                                       QLineEdit::Normal, "新卡组", &is_ok);
+  if (!is_ok || text.isEmpty()) return;
   globals.db.AddPack(text);
 }
 
@@ -132,13 +154,14 @@ void ManagerWindow::RenamePack() {
   auto pack = pack_combo->GetPack();
   if (pack == nullptr) {
     qWarning() << "ManagerWindow RenamePack: no pack";
-    QMessageBox::information(this, "Error", "请选择卡组.");
     return;
   }
-  QString text = QInputDialog::getText(this, "Rename", "请重命名:");
+  bool is_ok;
+  QString text = QInputDialog::getText(
+      this, "重命名", QString{"请输入卡组“%1”的新名称："}.arg(pack->label),
+      QLineEdit::Normal, pack->label, &is_ok);
+  if (!is_ok || text.isEmpty()) return;
   globals.db.RenamePack(text, *pack);
-
-  // TODO: 用对话框实现重命名
 }
 
 void ManagerWindow::RemovePack() {
@@ -151,10 +174,10 @@ void ManagerWindow::RemovePack() {
 }
 
 void ManagerWindow::ChangeItem(QListWidgetItem *item) {
-  // TODO: unimplemented
   if (item == nullptr) {
     edit_card_button->setEnabled(false);
     remove_card_button->setEnabled(false);
+    return;
   }
 
   edit_card_button->setEnabled(true);

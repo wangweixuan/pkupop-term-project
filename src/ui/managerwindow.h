@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
@@ -23,39 +24,36 @@ class ManagerWindow : public QWidget {
   Q_OBJECT;
 
  private:
-  /// 当前显示的组数，随着添加卡片而更新
-  pack_id_t packnum;
-
   AppGlobals &globals;
 
   QVBoxLayout *main_layout;
 
   QHBoxLayout *top_layout;
-  QVBoxLayout *pack_toolbar_layout;
+  QLabel *choosepack_text;
+  PackCombo *pack_combo;
   QPushButton *add_pack_button;
+
+  QHBoxLayout *pack_toolbar_layout;
   QPushButton *rename_pack_button;
   QPushButton *remove_pack_button;
-  QPushButton *export_pack_button;
-  QPushButton *import_pack_button;
+  /* QPushButton *export_pack_button; */
+  /* QPushButton *import_pack_button; */
 
-  PackCombo *pack_combo;
+  QListWidget *card_list;
+
+  QCheckBox *details_check;
 
   QHBoxLayout *card_toolbar_layout;
   QPushButton *compose_card_button;
   QPushButton *edit_card_button;
   QPushButton *remove_card_button;
 
-  QLabel *choosepack_text;
-
-  QListWidget *card_list;
-
  public:
   /// 初始化管理卡片窗口.
   explicit ManagerWindow(AppGlobals &globals);
 
-  /// 设置界面状态, 使界面显示指定卡组及其中卡片列表.
-  /// pack 应匹配当前 pack_combo 所选的卡组, 或为 nullptr.
-  void SetPack(CardPack *pack);
+  /// 获取选中的卡片.
+  Card *GetCard();
 
  private slots:
   /// 添加卡组.
@@ -75,9 +73,10 @@ class ManagerWindow : public QWidget {
   /// 只在 card 为当前列表中的卡片时有效.
   void UpdateCard(Card &card);
 
+  /// 设置界面状态, 使界面显示指定卡组及其中卡片列表.
   /// 接收 PackCombo 的信号, 切换所选卡组.
   /// 另见 SetPack().
-  void ChangePack(CardPack *pack);
+  void ChangePack();
 
   /// 接收 PackCombo 的信号, 更新卡组信息.
   /// 另见 SetPack().

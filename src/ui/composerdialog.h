@@ -6,13 +6,15 @@
 
 #include <QComboBox>
 #include <QDialog>
+#include <QFormLayout>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLayout>
 #include <QList>
 #include <QListWidget>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QStackedLayout>
 #include <QTextEdit>
 #include <QWidget>
 
@@ -39,8 +41,8 @@ class ComposerDialog : public QDialog {
   /// 生成的卡片列表.
   CardStemList generated_cards;
 
-  /// 卡组选择框.
-  PackCombo *pack_combo;
+  /// 布局
+  QFormLayout *main_layout;
 
   /// 模板选择框.
   QComboBox *prompt_combo;
@@ -48,31 +50,28 @@ class ComposerDialog : public QDialog {
   /// 关键词输入框.
   QTextEdit *keywords_input;
 
-  /// "生成" 按钮.
+  QHBoxLayout *button_layout;
+  /// "生成预览" 按钮.
   QPushButton *generate_button;
-  /// "取消" 按钮.
+  /// "清空预览" 按钮.
   QPushButton *cancel_button;
-  /// "确认" 按钮.
-  QPushButton *confirm_button;
-  /// "退出" 按钮
-  QPushButton *leave_button;
 
-  /// 布局
-  QVBoxLayout *main_layout;
-  QHBoxLayout *hori_layout[6];
-
+  QStackedLayout *generated_layout;
   /// 生成文本, 滚动界面
-  QScrollArea *generate_text;
-
+  QScrollArea *generated_area;
   /// 生成界面
-  QListWidget *generate_list;
-
-  /// 文字标签
-  QLabel *packcombo_label;
-  QLabel *prompt_label;
-  QLabel *keywords_label;
-  QLabel *generate_label;
+  QListWidget *generated_list;
+  /// 错误标签
   QLabel *error_label;
+
+  /// 卡组选择框.
+  PackCombo *pack_combo;
+
+  QHBoxLayout *bottom_button_layout;
+  /// "保存" 按钮.
+  QPushButton *confirm_button;
+  /// "取消" 按钮
+  QPushButton *leave_button;
 
  public:
   explicit ComposerDialog(QWidget *parent, AppGlobals &globals);
