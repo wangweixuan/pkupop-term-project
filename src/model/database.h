@@ -39,11 +39,17 @@ class CardDatabase : public QObject {
 
   /// 创建以 label 为名称的卡组.
   void AddPack(QString const &label);
+  /// 卡组重命名
+  void RenamePack(QString const &label, CardPack &pack);
   /// 移除指定的卡组.
   void RemovePack(pack_id_t pack);
 
   /// 在指定的卡组中, 创建以 stem 为内容的卡片.
   void AddCard(CardStem const &stem, CardPack &pack);
+
+  /// 在指定的卡组中，重新编辑卡片
+  void editcard(CardStem const &stem, Card *card, CardPack &pack);
+
   /// 在指定的卡组中, 移除指定的卡片.
   void RemoveCard(card_id_t card, CardPack &pack);
 

@@ -68,7 +68,6 @@ int main(int argc, char *argv[]) {
   globals.db.AddCard(card13, globals.db.packs[2]);
 
   globals.SaveDatabase();
-
   StudyWindow window{globals};
   window.show();
   return app.exec();

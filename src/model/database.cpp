@@ -27,6 +27,11 @@ void CardDatabase::AddPack(QString const &label) {
   emit list_updated();
 }
 
+void CardDatabase::RenamePack(QString const &label, CardPack &pack) {
+  pack.label = label;
+  emit list_updated();
+}
+
 void CardDatabase::RemovePack(pack_id_t pack) {
   packs.erase(std::remove_if(packs.begin(), packs.end(),
                              [=](CardPack &p) { return p.id == pack; }),
@@ -38,6 +43,13 @@ void CardDatabase::AddCard(CardStem const &stem, CardPack &pack) {
   Card card(stem);
   card.id = incremental_card_id++;
   pack.cards.append(card);
+  emit pack_updated(pack);
+}
+
+void CardDatabase::editcard(CardStem const &stem, Card *card, CardPack &pack) {
+  Card card1(stem);
+  card1.id = card->id;
+  *card = card1;
   emit pack_updated(pack);
 }
 

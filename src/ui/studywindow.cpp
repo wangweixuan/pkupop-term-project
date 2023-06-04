@@ -1,8 +1,9 @@
 /* Aijika, a PKU POP term project
  * Copyright 2023 Wang Weixuan, Hou Xusen, Zheng Shiqi
  * SPDX-License-Identifier: Apache-2.0 */
-
 #include "ui/studywindow.h"
+
+#include <QMessageBox>
 
 #include "model/card.h"
 #include "ui/composerdialog.h"
@@ -48,10 +49,14 @@ StudyWindow::StudyWindow(AppGlobals &globals)
 
   toolbar_layout->addWidget(edit_button);
   connect(edit_button, &QPushButton::clicked, [this, &globals]() {
-    auto window = new EditorDialog{this, globals};
+    if (GetCard() == nullptr) {
+      QMessageBox::information(this, "编辑卡片", "请选择卡片.");
+      return;
+    }
+    auto window =
+        new EditorDialog{0, globals, GetCard(), pack_combo->GetPack()};
     window->show();
   });
-
   toolbar_layout->addWidget(manage_button);
   connect(manage_button, &QPushButton::clicked, [&globals]() {
     auto window = new ManagerWindow{globals};

@@ -68,7 +68,8 @@ class ComposerDialog : public QDialog {
   QListWidget *generate_list;
 
   /// 文字标签
-  QLabel *question_label;
+  QLabel *packcombo_label;
+  QLabel *prompt_label;
   QLabel *keywords_label;
   QLabel *generate_label;
   QLabel *error_label;

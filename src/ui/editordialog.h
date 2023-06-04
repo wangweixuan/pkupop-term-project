@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
+#include <QPushButton>>
 #include <QTextEdit>
 #include <QWidget>
 
@@ -29,9 +30,6 @@ class EditorDialog : public QDialog {
   pack_id_t pack_id;
 
   /// 卡组选择，关键词，正面，背面编辑框
-  PackCombo *pack_list;
-  QLabel *choosecard_text;
-  QLabel *choosepack_text;
 
   QLabel *keyword_text;
   QLabel *front_text;
@@ -44,24 +42,20 @@ class EditorDialog : public QDialog {
   QVBoxLayout *main_layout;
   QHBoxLayout *hori_layout[6];
 
-  /// 卡组的列表
-  QListWidget *card_list;
-
   /// 保存按钮
-  QPushButton *save;
+  QPushButton *save_button;
 
   /// 取消按钮
-  QPushButton *cancel;
+  QPushButton *cancel_button;
 
  public:
-  explicit EditorDialog(QWidget *parent, AppGlobals &globals);
+  explicit EditorDialog(QWidget *parent, AppGlobals &globals, Card *card,
+                        CardPack *pack);
 
+ public slots:
   void SetCard(Card &card);
 
   void SetPack(CardPack &pack);
-
- public slots:
-  void changecard();
 };
 
 }  // namespace aijika

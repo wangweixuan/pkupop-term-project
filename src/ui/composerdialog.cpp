@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
+#include "components/packcombo.h"
 #include "generator/generator.h"
 #include "generator/prompt.h"
 
@@ -37,7 +38,8 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
 
       generate_list{new QListWidget{generate_text}},
 
-      question_label{new QLabel{"模板:", this}},
+      packcombo_label{new QLabel{"选择卡组:", this}},
+      prompt_label{new QLabel{"选择模板:", this}},
       keywords_label{new QLabel{"关键词:", this}},
       generate_label{new QLabel{"生成结果:", this}},
       error_label{new QLabel{"生成出错啦", this}} {
@@ -48,7 +50,9 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   generate_text->setWidget(generate_list);
   generate_list->setGeometry(0, 0, 300, 1200);  // 主要是设置长宽，xy意义不大
 
-  hori_layout[1]->addWidget(question_label);
+  hori_layout[1]->addWidget(packcombo_label);
+  hori_layout[1]->addWidget(pack_combo);
+  hori_layout[1]->addWidget(prompt_label);
   hori_layout[1]->addWidget(prompt_combo);
   hori_layout[2]->addWidget(keywords_label);
   hori_layout[2]->addWidget(keywords_input);
