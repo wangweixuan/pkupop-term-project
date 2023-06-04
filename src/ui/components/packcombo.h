@@ -18,6 +18,8 @@ class PackCombo : public QComboBox {
  private:
   AppGlobals &globals;
 
+  bool is_updating_list;
+
  public:
   explicit PackCombo(QWidget *parent, AppGlobals &globals);
 

@@ -164,10 +164,14 @@ Card *StudyWindow::GetCard() {
 }
 
 void StudyWindow::SetCard(Card *card) {
+  card_id_t new_id = card == nullptr ? -1 : card->id;
+  if (card_id != new_id) {
+    answer_container_layout->setCurrentWidget(show_answer_button);
+  }
+  card_id = new_id;
+
   if (card == nullptr) {
     // 特殊情况
-    answer_container_layout->setCurrentWidget(show_answer_button);
-    card_id = -1;
     question_label->setText("无卡片");
     answer_label->setText("No card");
     edit_button->setEnabled(false);
@@ -178,11 +182,6 @@ void StudyWindow::SetCard(Card *card) {
   }
 
   // 更新文本内容和按钮状态
-  if (card_id != card->id) {
-    answer_container_layout->setCurrentWidget(show_answer_button);
-  }
-
-  card_id = card->id;
   question_label->setText(card->question);
   answer_label->setText(card->answer);
   edit_button->setEnabled(true);

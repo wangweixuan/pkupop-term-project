@@ -12,7 +12,7 @@ namespace aijika {
 
 // 构造函数
 PackCombo::PackCombo(QWidget *parent, AppGlobals &globals)
-    : QComboBox(parent), globals(globals) {
+    : QComboBox(parent), globals(globals), is_updating_list{false} {
   // 设置QComboBox属性
   setToolTip("选择卡组");
 
@@ -90,6 +90,7 @@ void PackCombo::UpdatePack(CardPack &pack) {
 
 // 更新卡组列表
 void PackCombo::UpdateList() {
+  is_updating_list = true;
   pack_id_t old_pack = currentIndex() == -1 ? -1 : currentData().toInt();
 
   SetList();
@@ -98,12 +99,16 @@ void PackCombo::UpdateList() {
   int index = findData(old_pack);
   if (index == -1) {
     setCurrentIndex(0);
-    return;
+    emit pack_changed(nullptr);
+  } else {
+    setCurrentIndex(index);
   }
-  setCurrentIndex(index);
+  is_updating_list = false;
 }
 
 void PackCombo::ChangeIndex(int index) {
+  if (is_updating_list) return;
+
   pack_id_t new_pack_id = itemData(index).toInt();
 
   // 如果选中卡组发生变化，则更新卡组信息

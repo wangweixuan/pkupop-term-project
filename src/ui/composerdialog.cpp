@@ -78,8 +78,15 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
 }
 
 void ComposerDialog::Generate() {
-  auto const &prompt = prompts[prompt_combo->currentIndex()];
-  generator->Generate(prompt, keywords_input->toPlainText());
+  Prompt *prompt;
+  prompt_id_t id = prompt_combo->currentData().toInt();
+  for (auto &p : prompts) {
+    if (p.id == id) {
+      prompt = &p;
+      break;
+    }
+  }
+  generator->Generate(*prompt, keywords_input->toPlainText());
 
   ShowError("正在生成……");
   cancel_button->setEnabled(true);

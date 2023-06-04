@@ -9,7 +9,9 @@
 namespace aijika {
 
 QString CardStem::Details() const {
-  return QString{"%1\n正面：%2\n背面：%3"}.arg(keyword, question, answer);
+  auto line2 = QString{question}.replace('\r', ' ').replace('\n', ' ');
+  auto line3 = QString{answer}.replace('\r', ' ').replace('\n', ' ');
+  return QString{"%1\n正面：%2\n背面：%3"}.arg(keyword, line2, line3);
 }
 
 Card::Card()
@@ -45,25 +47,24 @@ Card &Card::operator=(CardStem const &stem) {
 
 QString Card::Summary() const {
   if (IsDue()) {
-    return keyword + " (已到期)";
+    return keyword + " (需复习)";
   }
   return keyword;
 }
 
 QString Card::Details() const {
-  return QString{"%1\n正面：%2\n背面：%3"}.arg(Summary(), question, answer);
+  return CardStem{Summary(), question, answer}.Details();
 }
 
 bool Card::IsDue() const { return time_due <= QDateTime::currentDateTime(); }
 
-void Card::Update(UserQuality qualityy) {
-  int quality = int(qualityy);
-  interval = 1;
-  if (qualityy == UserQuality::again) {
+void Card::Update(UserQuality quality) {
+  if (quality == UserQuality::again) {
     easiness = std::max(1.3, easiness - 0.2);
     interval = 1;
   } else {
-    easiness += 0.1 - quality * (0.08 + quality * 0.02);
+    int value = int(quality);
+    easiness += 0.1 - value * (0.08 + value * 0.02);
     easiness = std::max(1.3, easiness);
     interval = std::round(interval * easiness);
   }

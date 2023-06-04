@@ -1,18 +1,101 @@
 [
   {
     "id": 101,
-    "label": "英语单词",
-    "system": "你要为英语学习者制作单词记忆卡片。我将在每一行提出一个英语单词或短语，你要分别生成记忆卡片并返回 JSON 数组。每张卡片表示为 3 个 JSON 字符串，首先是我提供的英语单词，然后是卡片正面（单词及其发音），最后是卡片背面（中文释义）。",
+    "label": "英译中",
+    "system": "你要为英语学习者制作单词记忆卡片。我将在每一行提出一个英语单词或短语，你要分别生成记忆卡片并返回 JSON 数组。每张卡片表示为 3 个 JSON 字符串，首先是我提供的英语单词，然后是卡片正面（单词及其发音），最后是卡片背面（中文释义），可以使用 Markdown。",
     "examples": [
       {
         "keyword": "disability",
-        "question": "disability |ˌdɪsəˈbɪlədi|",
-        "answer": "n. 残疾，不利条件"
+        "question": "**disability** |ˌdɪsəˈbɪlədi|",
+        "answer": "_n._ 残疾，不利条件"
       },
       {
         "keyword": "wait",
-        "question": "wait |weɪt|",
-        "answer": "v. 等待，盼望\nn. 等待"
+        "question": "**wait** |weɪt|",
+        "answer": "_v._ 等待，盼望\n\n_n._ 等待"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "label": "中译英",
+    "system": "你要为英语学习者制作单词记忆卡片。我将在每一行提出一个英语单词或短语，你要分别生成记忆卡片并返回 JSON 数组。每张卡片表示为 3 个 JSON 字符串，首先是我提供的英语单词，然后是卡片正面（中文释义），最后是卡片背面（单词及例句），可以使用 Markdown。",
+    "examples": [
+      {
+        "keyword": "disability",
+        "question": "_n._ 残疾，不利条件",
+        "answer": "# disability\n\n- The government provides financial assistance for people with disabilities."
+      },
+      {
+        "keyword": "wait",
+        "question": "_v._ 等待，盼望\n\n_n._ 等待",
+        "answer": "# wait\n\n- Could you wait a few minutes while I finish this phone call?"
+      }
+    ]
+  },
+  {
+    "id": 201,
+    "label": "C++ 概念",
+    "system": "你要为编程学生解释 C++ 关键词。我将在每一行提出一个 C++ 的概念、函数或类型，你要分别生成准确名称、介绍并返回 JSON 数组。每则解释表示为 3 个 JSON 字符串，首先是我提供的关键词，然后是准确名称，最后是介绍，可以使用 Markdown。",
+    "examples": [
+      {
+        "keyword": "lower bound",
+        "question": "`std::lower_bound`",
+        "answer": "在一个**已经升序排列的容器**中查找第一个不小于给定值的元素，返回找到的第一个不小于给定值的元素的迭代器，如果找不到则返回容器的结尾迭代器。"
+      },
+      {
+        "keyword": "multimap",
+        "question": "`std::multimap`",
+        "answer": "一种关联式容器，可以存储多个键值对，并允许存在**多个具有相同键的元素**。通常使用红黑树实现，并提供了一系列的成员函数，如插入、查找、删除等操作。"
+      },
+      {
+        "keyword": "make pair",
+        "question": "`std::make_pair`",
+        "answer": "生成一个 `std::pair` 对象，即一个键值对，可以用于关联容器中的插入操作或作为函数返回值。"
+      }
+    ]
+  },
+  {
+    "id": 202,
+    "label": "算法概念",
+    "system": "你要为编程学生解释算法。我将在每一行提出一个算法关键词，你要分别生成算法名称、介绍并返回 JSON 数组。每种算法表示为 3 个 JSON 字符串，首先是我提供的关键词，然后是算法名称，最后是介绍，可以使用 Markdown。",
+    "examples": [
+      {
+        "keyword": "DP",
+        "question": "动态规划",
+        "answer": "## 动态规划（*Dynamic Programming*）\n\n- 是一种用于解决最优化问题的算法。\n- 通过把原问题分解为子问题，并保存子问题的结果，从而避免了重复计算。\n- DP 通常用于解决具有重叠子问题和最优子结构性质的问题，例如最长公共子序列、背包问题等。"
+      },
+      {
+        "keyword": "DFS",
+        "question": "深度优先搜索",
+        "answer": "# 深度优先搜索（*Depth First Search*）\n\n- 是一种图形遍历算法。\n- 从一条未访问的路径开始深入探索，直到到达最深的节点，然后回溯到前一个节点，继续搜索另一条未访问的路径，直到所有节点都被访问为止。\n- DFS 通常使用递归实现。"
+      },
+      {
+        "keyword": "BFS",
+        "question": "广度优先搜索",
+        "answer": "# 广度优先搜索（*Breadth First Search*）\n\n- 是一种图形遍历算法。\n- 从起点开始，先访问所有直接相邻的节点，然后再访问这些节点相邻的节点，以此类推，直到到达目标节点或所有节点都被访问为止。\n- BFS 通常使用队列实现。"
+      }
+    ]
+  },
+  {
+    "id": 301,
+    "label": "智慧问答",
+    "system": "你要按照模板生成问题和回答。我将在每一行提出一个关于大学生活的关键词，你要分别生成学生关心的问题，并从“暂时不能给你明确的答复”、“这个需要你自己衡量”、“请你自行斟酌”三者中选取一个回答，并返回 JSON 数组。每个问答表示为 3 个 JSON 字符串，分别是关键词、问题、回答。",
+    "examples": [
+      {
+        "keyword": "培养计划",
+        "question": "培养计划有哪些具体内容？",
+        "answer": "# 暂时不能给你明确的答复！"
+      },
+      {
+        "keyword": "训练",
+        "question": "能否公布训练活动的安排？",
+        "answer": "# 这个需要你自己衡量！"
+      },
+      {
+        "keyword": "食堂",
+        "question": "如何评价新食堂的服务质量？",
+        "answer": "# 请你自行斟酌！"
       }
     ]
   }

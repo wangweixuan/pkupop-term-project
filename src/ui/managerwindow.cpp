@@ -6,6 +6,7 @@
 
 #include <QInputDialog>
 #include <QListWidgetItem>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include "model/card.h"
@@ -69,7 +70,7 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
           &ManagerWindow::RemovePack);
 
   connect(details_check, &QCheckBox::stateChanged, this,
-          &ManagerWindow::ChangePack);
+          &ManagerWindow::UpdatePack);
   connect(card_list, &QListWidget::currentItemChanged, this,
           &ManagerWindow::ChangeItem);
   connect(compose_card_button, &QPushButton::clicked, this, [&]() {
@@ -92,6 +93,10 @@ ManagerWindow::ManagerWindow(AppGlobals &globals)
       qWarning() << "ManagerWindow RemoveCard: no card";
       return;
     }
+    auto reply = QMessageBox::question(
+        this, "删除卡片", QString{"确定删除卡片“%1”吗？"}.arg(card->keyword),
+        QMessageBox::Yes | QMessageBox::No);
+    if (reply != QMessageBox::Yes) return;
     globals.db.RemoveCard(card->id, *pack_combo->GetPack());
   });
 
@@ -126,7 +131,7 @@ Card *ManagerWindow::GetCard() {
   if (item == nullptr || pack == nullptr) {
     return nullptr;
   }
-  int card_id = item->data(QListWidgetItem::UserType).toInt();
+  card_id_t card_id = item->data(QListWidgetItem::UserType).toInt();
   return pack->FindCard(card_id);
 }
 
@@ -146,7 +151,8 @@ void ManagerWindow::AddPack() {
   QString text = QInputDialog::getText(this, "添加卡组", "请输入新卡组名称：",
                                        QLineEdit::Normal, "新卡组", &is_ok);
   if (!is_ok || text.isEmpty()) return;
-  globals.db.AddPack(text);
+  auto new_pack = globals.db.AddPack(text);
+  pack_combo->SetPack(new_pack);
 }
 
 void ManagerWindow::RenamePack() {
@@ -169,6 +175,10 @@ void ManagerWindow::RemovePack() {
     qWarning() << "ManagerWindow RemovePack: no pack";
     return;
   }
+  auto reply = QMessageBox::question(
+      this, "删除卡组", QString{"确定删除卡组“%1”吗？"}.arg(pack->label),
+      QMessageBox::Yes | QMessageBox::No);
+  if (reply != QMessageBox::Yes) return;
   globals.db.RemovePack(pack->id);
 }
 

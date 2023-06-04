@@ -38,7 +38,7 @@ class CardDatabase : public QObject {
   CardPack *FindPack(pack_id_t pack);
 
   /// 创建以 label 为名称的卡组.
-  void AddPack(QString const &label);
+  CardPack *AddPack(QString const &label);
   /// 卡组重命名
   void RenamePack(QString const &label, CardPack &pack);
   /// 移除指定的卡组.

@@ -4,6 +4,8 @@
 
 #include "model/database.h"
 
+#include "model/pack.h"
+
 namespace aijika {
 
 CardDatabase::CardDatabase()
@@ -21,10 +23,11 @@ CardPack *CardDatabase::FindPack(pack_id_t id) {
   return nullptr;
 }
 
-void CardDatabase::AddPack(QString const &label) {
+CardPack *CardDatabase::AddPack(QString const &label) {
   CardPack pack = {incremental_pack_id++, label, QList<Card>(), -1};
   packs.append(pack);
   emit list_updated();
+  return &packs.back();
 }
 
 void CardDatabase::RenamePack(QString const &label, CardPack &pack) {
