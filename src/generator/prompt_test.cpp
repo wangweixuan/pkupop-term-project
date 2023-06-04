@@ -51,6 +51,7 @@ TEST(PromptTest, ToMessages) {
                   << CardStem{"\"k\"\"", "q\n\t\n", "<a></a>"};
 
   ApiRequest request;
+  request.SetModel("gpt-3.5-turbo");
   prompt.ToMessages(request);
 
   EXPECT_EQ(

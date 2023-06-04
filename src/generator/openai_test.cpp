@@ -18,6 +18,7 @@ ApiRequest ExampleRequest() {
   using Role = ApiRequest::Role;
 
   ApiRequest request;
+  request.SetModel("gpt-3.5-turbo");
   request.AddMessage(Role::user, "Say hello, World!");
   request.AddMessage(Role::assistant, "Hello, World!");
   request.AddMessage(Role::user, "Say hello, Aijika!");

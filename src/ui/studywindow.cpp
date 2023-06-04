@@ -23,11 +23,15 @@ StudyWindow::StudyWindow(AppGlobals &globals)
       edit_button{new QPushButton{"编辑卡片", this}},
       manage_button{new QPushButton{"管理卡片", this}},
       settings_button{new QPushButton{"设置", this}},
-      card_widget{new QWidget{this}},
-      card_layout{new QVBoxLayout{nullptr}},
+      card_splitter{new QSplitter{Qt::Vertical, this}},
+      question_area{new QScrollArea{card_splitter}},
       question_label{new QLabel{this}},
+      answer_container{new QWidget{card_splitter}},
+      answer_container_layout{new QStackedLayout{answer_container}},
+      answer_area{new QScrollArea{nullptr}},
       answer_label{new QLabel{this}},
-      show_answer_button{new QPushButton{"显示答案", this}},
+      show_answer_button{new QPushButton{"显示答案", nullptr}},
+      quality_group{new QButtonGroup{this}},
       quality_layout{new QHBoxLayout{nullptr}},
       quality_buttons{
           new QPushButton{"重来", this}, new QPushButton{"困难", this},
@@ -70,28 +74,54 @@ StudyWindow::StudyWindow(AppGlobals &globals)
   });
 
   // 卡片
-  main_layout->addWidget(card_widget, /* stretch */ 1);
-  card_widget->setLayout(card_layout);
+  main_layout->addWidget(card_splitter, /* stretch */ 1);
+  card_splitter->setChildrenCollapsible(false);
+  card_splitter->setHandleWidth(3);
 
-  card_layout->addWidget(question_label);
-  question_label->setTextFormat(Qt::TextFormat::PlainText);
+  question_area->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  question_area->setWidgetResizable(true);
+  question_area->setWidget(question_label);
+  question_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  question_label->setTextFormat(Qt::MarkdownText);
+  question_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  question_label->setCursor(Qt::IBeamCursor);
+  question_label->setWordWrap(true);
 
-  card_layout->addWidget(answer_label);
-  answer_label->setTextFormat(Qt::TextFormat::PlainText);
-  answer_label->hide();
-
-  card_layout->addWidget(show_answer_button);
+  answer_area->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  answer_area->setWidgetResizable(true);
+  answer_area->setWidget(answer_label);
+  answer_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  answer_label->setTextFormat(Qt::MarkdownText);
+  answer_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  answer_label->setCursor(Qt::IBeamCursor);
+  answer_label->setWordWrap(true);
+  answer_container_layout->setContentsMargins(0, 0, 0, 0);
+  answer_container_layout->addWidget(answer_area);
+  answer_container_layout->addWidget(show_answer_button);
 
   // 卡片反馈
   main_layout->addLayout(quality_layout);
 
-  quality_layout->addWidget(quality_buttons[0]);
-
-  quality_layout->addWidget(quality_buttons[1]);
-
-  quality_layout->addWidget(quality_buttons[2]);
-
-  quality_layout->addWidget(quality_buttons[3]);
+  quality_buttons[0]->setStyleSheet(
+      "QPushButton { border: none; min-height: 30px; }"
+      "QPushButton:enabled { background-color: #e53935; color: #000000; }"
+      "QPushButton:pressed { background-color: #d32f2f; }");
+  quality_buttons[1]->setStyleSheet(
+      "QPushButton { border: none; min-height: 30px; }"
+      "QPushButton:enabled { background-color: #fbc02d; color: #000000; }"
+      "QPushButton:pressed { background-color: #f9a825; }");
+  quality_buttons[2]->setStyleSheet(
+      "QPushButton { border: none; min-height: 30px; }"
+      "QPushButton:enabled { background-color: #0288d1; color: #fefefe; }"
+      "QPushButton:pressed { background-color: #0277bd; }");
+  quality_buttons[3]->setStyleSheet(
+      "QPushButton { border: none; min-height: 30px; }"
+      "QPushButton:enabled { background-color: #388e3c; color: #fefefe; }"
+      "QPushButton:pressed { background-color: #2e7d32 }");
+  for (int i = 0; i < 4; ++i) {
+    quality_group->addButton(quality_buttons[i], i);
+    quality_layout->addWidget(quality_buttons[i]);
+  }
 
   // 底部状态栏
   main_layout->addWidget(statusbar_label);
@@ -103,18 +133,18 @@ StudyWindow::StudyWindow(AppGlobals &globals)
   connect(pack_combo, &PackCombo::pack_changed, this, &StudyWindow::ChangePack);
   connect(pack_combo, &PackCombo::pack_updated, this, &StudyWindow::UpdatePack);
 
-  connect(show_answer_button, &QPushButton::clicked, answer_label,
-          &QLabel::show);
+  connect(show_answer_button, &QPushButton::clicked,
+          [&]() { answer_container_layout->setCurrentWidget(answer_area); });
 
-  for (int i = 0; i < 4; i++) {
-    connect(quality_buttons[i], &QPushButton::clicked, [this, i]() {
-      Card *tmp = GetCard();
-      UserQuality quality = static_cast<UserQuality>(4 - i);
-      tmp->Update(quality);
-      emit this->globals.db.card_updated(*tmp);
-      SetPack(pack_combo->GetPack());
-    });
-  }
+  connect(quality_group, &QButtonGroup::idClicked, [this](int i) {
+    Card *tmp = GetCard();
+    if (tmp == nullptr) return;
+
+    UserQuality quality = static_cast<UserQuality>(4 - i);
+    tmp->Update(quality);
+    emit this->globals.db.card_updated(*tmp);
+    SetPack(pack_combo->GetPack());
+  });
 
   UpdateAppearance();
 
@@ -129,24 +159,26 @@ Card *StudyWindow::GetCard() {
 }
 
 void StudyWindow::SetCard(Card *card) {
+  answer_container_layout->setCurrentWidget(show_answer_button);
+
   if (card == nullptr) {
     // 特殊情况
     card_id = -1;
-    qDebug() << "StudyWindow SetCard: no card";
-    question_label->setText("暂无卡片");
-    answer_label->hide();
-    show_answer_button->setEnabled(false);
+    question_label->setText("无卡片");
+    answer_label->setText("No card");
+    for (auto &button : quality_buttons) {
+      button->setEnabled(false);
+    }
     return;
   }
 
-  card_id = card->id;
   // 更新文本内容和按钮状态
+  card_id = card->id;
   question_label->setText(card->question);
   answer_label->setText(card->answer);
-  answer_label->hide();
-  show_answer_button->setEnabled(true);
-
-  qDebug() << card->answer;
+  for (auto &button : quality_buttons) {
+    button->setEnabled(true);
+  }
 }
 
 void StudyWindow::SetPack(CardPack *pack) {
@@ -173,9 +205,7 @@ void StudyWindow::SetPack(CardPack *pack) {
 }
 
 void StudyWindow::UpdateAppearance() {
-  auto style_sheet = globals.settings.StyleSheet();
-  question_label->setStyleSheet(style_sheet);
-  answer_label->setStyleSheet(style_sheet);
+  card_splitter->setStyleSheet(globals.settings.StyleSheet());
 }
 
 void StudyWindow::UpdateCard(Card &card) {

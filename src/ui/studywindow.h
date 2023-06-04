@@ -4,10 +4,13 @@
 
 #pragma once
 
-#include <QHBoxLayout>
+#include <QBoxLayout>
+#include <QButtonGroup>
 #include <QLabel>
 #include <QPushButton>
-#include <QVBoxLayout>
+#include <QScrollArea>
+#include <QSplitter>
+#include <QStackedLayout>
 #include <QWidget>
 
 #include "common/globals.h"
@@ -33,12 +36,16 @@ class StudyWindow : public QWidget {
   QPushButton *manage_button;
   QPushButton *settings_button;
 
-  QWidget *card_widget;
-  QVBoxLayout *card_layout;
+  QSplitter *card_splitter;
+  QScrollArea *question_area;
   QLabel *question_label;
+  QWidget *answer_container;
+  QStackedLayout *answer_container_layout;
+  QScrollArea *answer_area;
   QLabel *answer_label;
   QPushButton *show_answer_button;
 
+  QButtonGroup *quality_group;
   QHBoxLayout *quality_layout;
   QPushButton *quality_buttons[4];
 

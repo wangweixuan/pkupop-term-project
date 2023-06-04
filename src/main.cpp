@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   app.setApplicationDisplayName("AI 记卡");
 
   AppGlobals globals{&app};
+  globals.RestoreSettings();
 
   CardStem card1{"apple", "Which fruit is red, round and juicy?", "Apple."};
   CardStem card2{"dog", "What domesticated animal is a man's best friend?",
@@ -67,7 +68,6 @@ int main(int argc, char *argv[]) {
   globals.db.AddCard(card12, globals.db.packs[2]);
   globals.db.AddCard(card13, globals.db.packs[2]);
 
-  globals.SaveDatabase();
   StudyWindow window{globals};
   window.show();
   return app.exec();

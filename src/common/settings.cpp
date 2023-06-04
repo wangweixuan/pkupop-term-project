@@ -4,7 +4,7 @@
 
 #include "common/settings.h"
 
-#include <QStringList>
+#include <QString>
 #include <QtDebug>
 
 namespace aijika {
@@ -24,11 +24,10 @@ namespace predefined_styles {
 // Licensed under CC0
 constexpr char const *k_font_families[5]{
     /* old style */
-    "'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, '楷体', "
-    "serif",
+    "'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, STKaiti, "
+    "'楷体', serif",
     /* transitional */
-    "Charter, 'Bitstream Charter', 'Sitka Text', Cambria, '宋体', "
-    "serif",
+    "Charter, 'Bitstream Charter', 'Sitka Text', Cambria, '宋体', serif",
     /* neo_grotesk */
     "Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, "
     "'黑体', sans-serif",
@@ -36,7 +35,8 @@ constexpr char const *k_font_families[5]{
     "Avenir, 'Avenir Next LT Pro', Montserrat, Corbel, 'URW Gothic', "
     "source-sans-pro, '黑体', sans-serif",
     /* humanistic */
-    "Optima, Candara, 'Noto Sans', source-sans-pro, '楷体', sans-serif"};
+    "Optima, Candara, 'Noto Sans', source-sans-pro, STKaiti, '楷体', "
+    "sans-serif"};
 
 constexpr char const *k_background_colors[4]{/* white */
                                              "#fcfcfc",
@@ -60,16 +60,13 @@ constexpr char const *k_colors[4]{/* white */
 QString AppSettings::StyleSheet() const {
   using namespace predefined_styles;
 
-  QStringList parts{"QFrame { font-family:",
-                    k_font_families[int(font_family)],
-                    "; font-size:",
-                    QString::number(font_size),
-                    "pt; background-color:",
-                    k_background_colors[int(theme)],
-                    "; color:",
-                    k_colors[int(theme)],
-                    "; }"};
-  return parts.join("");
+  return QString{
+      "QFrame, QPushButton { font-family: %1; font-size: %2pt; "
+      "background-color: %3; color: %4; border: none; }"
+      "QLabel { padding: 5px %2px; }"
+      "QSplitter:handle { background-color: %4 }"}
+      .arg(k_font_families[int(font_family)], QString::number(font_size),
+           k_background_colors[int(theme)], k_colors[int(theme)]);
 }
 
 void AppSettings::SetFontFamily(int which) {
