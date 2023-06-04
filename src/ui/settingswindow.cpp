@@ -4,6 +4,8 @@
 
 #include "ui/settingswindow.h"
 
+#include <QMessageBox>
+
 #include "common/settings.h"
 
 namespace aijika {
@@ -12,6 +14,7 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
     : QWidget{nullptr},
       globals{globals},
       main_layout{new QVBoxLayout{this}},
+
       appearance_group{new QGroupBox{"外观设置", this}},
       appearance_layout{new QFormLayout{appearance_group}},
       font_family_box{new QComboBox{this}},
@@ -20,6 +23,14 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
       theme_layout{new QHBoxLayout{nullptr}},
       theme_buttons{new QRadioButton{this}, new QRadioButton{this},
                     new QRadioButton{this}, new QRadioButton{this}},
+
+      learning_group{new QGroupBox{"学习设置", this}},
+      learning_layout{new QFormLayout{learning_group}},
+      review_box{new QComboBox{this}},
+      schedule_layout{new QHBoxLayout{nullptr}},
+      advance_button{new QPushButton{"提前进度", this}},
+      postpone_button{new QPushButton{"延后进度", this}},
+
       api_group{new QGroupBox{"API 设置", this}},
       api_layout{new QFormLayout{api_group}},
       api_base_url_edit{new QComboBox{this}},
@@ -30,18 +41,39 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
   appearance_layout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
   appearance_layout->setFormAlignment(Qt::AlignLeft);
   appearance_layout->setLabelAlignment(Qt::AlignRight);
-  for (int i = 0; i < 5; ++i) {
-    font_family_box->addItem(k_predefined_font_names[i], i);
+  int i = 0;
+  for (auto const& name : globals.settings.PredefinedFonts()) {
+    font_family_box->addItem(name, i);
+    ++i;
   }
   appearance_layout->addRow("字体：", font_family_box);
   appearance_layout->addRow("字号：", font_size_box);
-  for (int i = 0; i < 4; ++i) {
-    theme_buttons[i]->setText(k_predefined_theme_names[i]);
+  i = 0;
+  for (auto const& name : globals.settings.PredefinedThemes()) {
+    theme_buttons[i]->setText(name);
     theme_group->addButton(theme_buttons[i], i);
     theme_layout->addWidget(theme_buttons[i]);
+    ++i;
   }
   appearance_layout->addRow("主题：", theme_layout);
   main_layout->addWidget(appearance_group);
+
+  main_layout->addSpacing(10);
+
+  learning_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+  learning_layout->setFormAlignment(Qt::AlignLeft);
+  learning_layout->setLabelAlignment(Qt::AlignRight);
+  review_box->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  i = 0;
+  for (auto const& name : globals.settings.ReviewOptions()) {
+    review_box->addItem(name, i);
+    ++i;
+  }
+  learning_layout->addRow("顺序：", review_box);
+  schedule_layout->addWidget(advance_button);
+  schedule_layout->addWidget(postpone_button);
+  learning_layout->addRow("调整：", schedule_layout);
+  main_layout->addWidget(learning_group);
 
   main_layout->addSpacing(10);
 
@@ -58,16 +90,19 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
   font_size_box->setValue(globals.settings.font_size);
   theme_buttons[int(globals.settings.theme)]->setChecked(true);
 
+  review_box->setCurrentIndex(
+      review_box->findData(int(globals.settings.review)));
+
   api_base_url_edit->setEditable(true);
   api_base_url_edit->setInsertPolicy(QComboBox::NoInsert);
-  for (auto value : k_predefined_api_base_url) {
+  for (auto const& value : globals.settings.WellKnownApiBaseUrls()) {
     api_base_url_edit->addItem(value);
   }
   api_base_url_edit->setCurrentText(globals.settings.api_base_url);
   api_key_edit->setText(globals.settings.api_key);
   api_model_edit->setEditable(true);
   api_model_edit->setInsertPolicy(QComboBox::NoInsert);
-  for (auto value : k_predefined_api_model) {
+  for (auto const& value : globals.settings.WellKnownApiModels()) {
     api_model_edit->addItem(value);
   }
   api_model_edit->setCurrentText(globals.settings.api_model);
@@ -79,6 +114,21 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
           [&](int value) { globals.settings.SetFontSize(value); });
   connect(theme_group, &QButtonGroup::idClicked,
           [&](int id) { globals.settings.SetTheme(id); });
+
+  connect(review_box, &QComboBox::currentIndexChanged, [&]() {
+    globals.settings.SetReview(review_box->currentData().toInt());
+  });
+  connect(advance_button, &QPushButton::clicked, [&]() {
+    globals.db.AdvanceAll();
+    QMessageBox::information(this, "调整进度",
+                             "所有卡片的到期时间已提前一天。");
+  });
+  connect(postpone_button, &QPushButton::clicked, [&]() {
+    globals.db.PostponeAll();
+    QMessageBox::information(this, "调整进度",
+                             "所有卡片的到期时间已延后一天。");
+  });
+
   connect(api_base_url_edit, &QComboBox::currentTextChanged,
           [&](QString const& text) { globals.settings.SetApiBaseUrl(text); });
   connect(api_key_edit, &QLineEdit::textChanged,

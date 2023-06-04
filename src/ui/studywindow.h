@@ -66,10 +66,6 @@ class StudyWindow : public QWidget {
   /// card 应在当前所选的卡组中, 或为 nullptr.
   void SetCard(Card *card);
 
-  /// 设置界面状态, 使界面显示指定卡组及其中合适的卡片.
-  /// pack 应匹配当前 pack_combo 所选的卡组, 或为 nullptr.
-  void SetPack(CardPack *pack);
-
  public slots:
   /// 接收 AppSettings 的信号, 更新界面显示设置.
   void UpdateAppearance();
@@ -79,13 +75,9 @@ class StudyWindow : public QWidget {
   /// 另见 SetCard().
   void UpdateCard(Card &card);
 
-  /// 接收 PackCombo 的信号, 切换所选卡组.
-  /// 另见 SetPack().
-  void ChangePack(CardPack *pack);
-
-  /// 接收 PackCombo 的信号, 更新卡组信息.
-  /// 另见 SetPack().
-  void UpdatePack(CardPack &pack);
+  /// 设置界面状态, 使界面显示指定卡组及其中合适的卡片.
+  /// 接收 PackCombo 的信号, 切换所选卡组或更新卡组信息.
+  void ChangePack();
 };
 
 }  // namespace aijika

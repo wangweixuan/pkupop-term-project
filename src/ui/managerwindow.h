@@ -75,12 +75,10 @@ class ManagerWindow : public QWidget {
 
   /// 设置界面状态, 使界面显示指定卡组及其中卡片列表.
   /// 接收 PackCombo 的信号, 切换所选卡组.
-  /// 另见 SetPack().
   void ChangePack();
 
   /// 接收 PackCombo 的信号, 更新卡组信息.
-  /// 另见 SetPack().
-  void UpdatePack(CardPack &pack);
+  void UpdatePack();
 };
 
 }  // namespace aijika

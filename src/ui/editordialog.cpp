@@ -50,8 +50,15 @@ EditorDialog::EditorDialog(QWidget *parent, AppGlobals &globals, Card *card,
   back_edit->setPlainText(card->answer);
   repetition_label->setText(QString::number(card->repetition));
   time_created_label->setText(card->time_created.toString(date_format));
-  time_reviewed_label->setText(card->time_reviewed.toString(date_format));
+  if (card->repetition == 0) {
+    time_reviewed_label->setText("未复习");
+  } else {
+    time_reviewed_label->setText(card->time_reviewed.toString(date_format));
+  }
   time_due_label->setText(card->time_due.toString(date_format));
+  if (card->IsDue()) {
+    time_due_label->setText(time_due_label->text() + " (已到期)");
+  }
 
   connect(save_button, &QPushButton::clicked, this, &EditorDialog::Save);
   connect(cancel_button, &QPushButton::clicked, this, &EditorDialog::close);

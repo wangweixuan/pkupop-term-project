@@ -53,6 +53,10 @@ class CardDatabase : public QObject {
   /// 在指定的卡组中, 移除指定的卡片.
   void RemoveCard(card_id_t card, CardPack &pack);
 
+  void AdvanceAll();
+
+  void PostponeAll();
+
   /// 将 db 序列化到数据流 out.
   friend QDataStream &operator<<(QDataStream &out, CardDatabase const &db);
   /// 从数据流 in 反序列化 db.

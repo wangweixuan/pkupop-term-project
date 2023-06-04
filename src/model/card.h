@@ -19,7 +19,7 @@ struct CardStem {
   /// 答案文本.
   QString answer;
 
-  QString Contents() const;
+  QString Details() const;
 };
 
 /// 用户对卡片记忆程度的分级. 用于间隔重复算法.
@@ -67,7 +67,10 @@ struct Card {
   /// 将卡片内容更改为 stem.
   Card &operator=(CardStem const &stem);
 
-  QString Contents() const;
+  QString Summary() const;
+  QString Details() const;
+
+  bool IsDue() const;
 
   /// 根据用户对卡片的分级 quality, 更新用于间隔重复算法的各个属性.
   /// 调用者应负责发出 CardDatabase::card_updated 信号.

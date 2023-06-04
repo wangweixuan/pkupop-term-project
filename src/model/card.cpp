@@ -8,9 +8,8 @@
 
 namespace aijika {
 
-QString CardStem::Contents() const {
-  return QString{"关键词：%1\n正面：%2\n背面：%3"}.arg(keyword, question,
-                                                       answer);
+QString CardStem::Details() const {
+  return QString{"%1\n正面：%2\n背面：%3"}.arg(keyword, question, answer);
 }
 
 Card::Card()
@@ -19,8 +18,8 @@ Card::Card()
       question(""),
       answer(""),
       time_created(QDateTime::currentDateTime()),
-      time_reviewed(QDateTime::currentDateTime()),
-      time_due(QDateTime::currentDateTime()),
+      time_reviewed(time_created),
+      time_due(time_created),
       repetition(0),
       interval(1),
       easiness(2.5) {}
@@ -31,10 +30,10 @@ Card::Card(CardStem const &stem)
       question(stem.question),
       answer(stem.answer),
       time_created(QDateTime::currentDateTime()),
-      time_reviewed(QDateTime::currentDateTime()),
-      time_due(QDateTime::currentDateTime().addDays(1)),
+      time_reviewed(time_created),
+      time_due(time_created),
       repetition(0),
-      interval(0),
+      interval(1),
       easiness(2.5) {}
 
 Card &Card::operator=(CardStem const &stem) {
@@ -44,10 +43,18 @@ Card &Card::operator=(CardStem const &stem) {
   return *this;
 }
 
-QString Card::Contents() const {
-  return QString{"关键词：%1\n正面：%2\n背面：%3"}.arg(keyword, question,
-                                                       answer);
+QString Card::Summary() const {
+  if (IsDue()) {
+    return keyword + " (已到期)";
+  }
+  return keyword;
 }
+
+QString Card::Details() const {
+  return QString{"%1\n正面：%2\n背面：%3"}.arg(Summary(), question, answer);
+}
+
+bool Card::IsDue() const { return time_due <= QDateTime::currentDateTime(); }
 
 void Card::Update(UserQuality qualityy) {
   int quality = int(qualityy);

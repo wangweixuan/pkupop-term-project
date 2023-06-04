@@ -4,9 +4,8 @@
 
 #include "model/pack.h"
 
+#include <QRandomGenerator>
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 
 namespace aijika {
 
@@ -23,7 +22,7 @@ Card *CardPack::ChooseCard(ReviewOption opt) {
   QList<Card *> candidates;
   QDateTime now = QDateTime::currentDateTime();
   for (auto &card : cards) {
-    if (card.time_reviewed.daysTo(now) >= card.interval) {
+    if (card.time_due <= now) {
       candidates.append(&card);
     }
   }
@@ -31,19 +30,16 @@ Card *CardPack::ChooseCard(ReviewOption opt) {
     return nullptr;
   }
   if (opt == ReviewOption::random) {
-    std::srand(std::time(nullptr));
-    int i = std::rand() % candidates.size();
-    return candidates[i];
+    return candidates[QRandomGenerator::global()->bounded(candidates.size())];
   }
   Card *chosen = candidates[0];
   for (int i = 1; i < candidates.size(); i++) {
     if (opt == ReviewOption::last_reviewed) {
-      if (candidates[i]->time_reviewed.daysTo(now) >
-          chosen->time_reviewed.daysTo(now)) {
+      if (candidates[i]->time_reviewed > chosen->time_reviewed) {
         chosen = candidates[i];
       }
     } else if (opt == ReviewOption::due_date) {
-      if (candidates[i]->time_due < chosen->time_due) {
+      if (candidates[i]->time_due > chosen->time_due) {
         chosen = candidates[i];
       }
     }
@@ -56,8 +52,8 @@ int CardPack::CountCards(ReviewOption opt) const {
   (void)opt;
   QDateTime now = QDateTime::currentDateTime();
   int count = 0;
-  for (auto &card : cards) {
-    if (card.time_reviewed.daysTo(now) >= card.interval) {
+  for (auto const &card : cards) {
+    if (card.time_due <= now) {
       count++;
     }
   }

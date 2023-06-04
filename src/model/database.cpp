@@ -58,6 +58,24 @@ void CardDatabase::RemoveCard(card_id_t card, CardPack &pack) {
   emit pack_updated(pack);
 }
 
+void CardDatabase::AdvanceAll() {
+  for (auto &pack : packs) {
+    for (auto &card : pack.cards) {
+      card.time_due = card.time_due.addDays(-1);
+    }
+    emit pack_updated(pack);
+  }
+}
+
+void CardDatabase::PostponeAll() {
+  for (auto &pack : packs) {
+    for (auto &card : pack.cards) {
+      card.time_due = card.time_due.addDays(1);
+    }
+    emit pack_updated(pack);
+  }
+}
+
 QDataStream &operator<<(QDataStream &out, CardDatabase const &db) {
   out << db.packs;
   out << db.incremental_pack_id;

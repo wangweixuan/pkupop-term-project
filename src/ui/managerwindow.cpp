@@ -113,7 +113,7 @@ void ManagerWindow::ChangePack() {
   rename_pack_button->setEnabled(true);
   remove_pack_button->setEnabled(true);
   for (auto &card : pack->cards) {
-    auto text = details ? card.Contents() : card.keyword;
+    auto text = details ? card.Details() : card.Summary();
     QListWidgetItem *item = new QListWidgetItem(text, card_list);
     item->setData(QListWidgetItem::UserType, card.id);
     card_list->addItem(item);
@@ -132,11 +132,10 @@ Card *ManagerWindow::GetCard() {
 
 void ManagerWindow::UpdateCard(Card &card) {
   (void)card;
-  UpdatePack(*pack_combo->GetPack());
+  UpdatePack();
 }
 
-void ManagerWindow::UpdatePack(CardPack &pack) {
-  (void)pack;
+void ManagerWindow::UpdatePack() {
   int old_row = card_list->currentRow();
   ChangePack();
   card_list->setCurrentRow(old_row);

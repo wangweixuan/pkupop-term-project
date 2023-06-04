@@ -7,6 +7,9 @@
 #include <QDataStream>
 #include <QObject>
 #include <QString>
+#include <QStringList>
+
+#include "model/pack.h"
 
 namespace aijika {
 
@@ -27,18 +30,6 @@ enum struct PredefinedTheme {
   black,   // 黑底白字.
 };
 
-constexpr char const *k_predefined_font_names[5]{
-    "Old style", "Transitional", "Neo-Grotesk", "Geometric", "Humanistic"};
-
-constexpr char const *k_predefined_theme_names[4]{"白色", "纸张", "灰暗",
-                                                  "夜间"};
-
-constexpr char const *k_predefined_api_base_url[2]{"https://api.openai.com",
-                                                   "http://localhost:8080"};
-
-constexpr char const *k_predefined_api_model[3]{"gpt-3.5-turbo", "gpt-4",
-                                                "gpt-4-32k"};
-
 /// 程序的设置, 与设置文件关联.
 class AppSettings : public QObject {
   Q_OBJECT;
@@ -54,6 +45,8 @@ class AppSettings : public QObject {
   PredefinedTheme theme;
 
   // 学习设置
+
+  ReviewOption review;
 
   // API 设置
 
@@ -71,11 +64,23 @@ class AppSettings : public QObject {
   /// 见 https://doc.qt.io/qt-6/stylesheet.html
   QString StyleSheet() const;
 
+  QStringList PredefinedFonts() const;
+
+  QStringList PredefinedThemes() const;
+
+  QStringList ReviewOptions() const;
+
+  QStringList WellKnownApiBaseUrls() const;
+
+  QStringList WellKnownApiModels() const;
+
   void SetFontFamily(int which);
 
   void SetFontSize(int value);
 
   void SetTheme(int which);
+
+  void SetReview(int which);
 
   void SetApiBaseUrl(QString const &value);
 

@@ -117,7 +117,7 @@ void ComposerDialog::ShowResults(CardStemList cards) {
   generated_list->clear();  // 清空当前列表中显示的卡片.
 
   for (auto &card : cards) {
-    generated_list->addItem(card.Contents());
+    generated_list->addItem(card.Details());
   }
 }
 

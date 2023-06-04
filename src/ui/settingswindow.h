@@ -10,6 +10,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QWidget>
@@ -34,6 +35,13 @@ class SettingsWindow : public QWidget {
   QButtonGroup *theme_group;
   QHBoxLayout *theme_layout;
   QRadioButton *theme_buttons[4];
+
+  QGroupBox *learning_group;
+  QFormLayout *learning_layout;
+  QComboBox *review_box;
+  QHBoxLayout *schedule_layout;
+  QPushButton *advance_button;
+  QPushButton *postpone_button;
 
   QGroupBox *api_group;
   QFormLayout *api_layout;

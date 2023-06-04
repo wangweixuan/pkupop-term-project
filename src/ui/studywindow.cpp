@@ -131,10 +131,12 @@ StudyWindow::StudyWindow(AppGlobals &globals)
 
   connect(&globals.settings, &AppSettings::appearance_updated, this,
           &StudyWindow::UpdateAppearance);
+  connect(&globals.settings, &AppSettings::learning_updated, this,
+          &StudyWindow::ChangePack);
   connect(&globals.db, &CardDatabase::card_updated, this,
           &StudyWindow::UpdateCard);
   connect(pack_combo, &PackCombo::pack_changed, this, &StudyWindow::ChangePack);
-  connect(pack_combo, &PackCombo::pack_updated, this, &StudyWindow::UpdatePack);
+  connect(pack_combo, &PackCombo::pack_updated, this, &StudyWindow::ChangePack);
 
   connect(show_answer_button, &QPushButton::clicked,
           [&]() { answer_container_layout->setCurrentWidget(answer_area); });
@@ -146,12 +148,12 @@ StudyWindow::StudyWindow(AppGlobals &globals)
     UserQuality quality = static_cast<UserQuality>(4 - i);
     tmp->Update(quality);
     emit this->globals.db.card_updated(*tmp);
-    SetPack(pack_combo->GetPack());
+    ChangePack();
   });
 
   UpdateAppearance();
 
-  SetPack(pack_combo->GetPack());
+  ChangePack();
 }
 
 Card *StudyWindow::GetCard() {
@@ -162,10 +164,9 @@ Card *StudyWindow::GetCard() {
 }
 
 void StudyWindow::SetCard(Card *card) {
-  answer_container_layout->setCurrentWidget(show_answer_button);
-
   if (card == nullptr) {
     // 特殊情况
+    answer_container_layout->setCurrentWidget(show_answer_button);
     card_id = -1;
     question_label->setText("无卡片");
     answer_label->setText("No card");
@@ -177,6 +178,10 @@ void StudyWindow::SetCard(Card *card) {
   }
 
   // 更新文本内容和按钮状态
+  if (card_id != card->id) {
+    answer_container_layout->setCurrentWidget(show_answer_button);
+  }
+
   card_id = card->id;
   question_label->setText(card->question);
   answer_label->setText(card->answer);
@@ -184,29 +189,6 @@ void StudyWindow::SetCard(Card *card) {
   for (auto &button : quality_buttons) {
     button->setEnabled(true);
   }
-}
-
-void StudyWindow::SetPack(CardPack *pack) {
-  if (pack == nullptr) {
-    // 特殊情况
-    SetCard(nullptr);
-    statusbar_label->setText("没有选择卡组");
-    return;
-  }
-
-  SetCard(pack->ChooseCard(ReviewOption::random));
-
-  int review_count = pack->CountCards(ReviewOption::random),
-      total_count = pack->CountTotalCards();
-  QString review_text;
-  if (total_count == 0) {
-    review_text = "卡组中没有卡片";
-  } else if (review_count == 0) {
-    review_text = "卡片都复习完啦";
-  } else {
-    review_text = QString{"还有 %1 张卡片要复习"}.arg(review_count);
-  }
-  statusbar_label->setText(review_text);
 }
 
 void StudyWindow::UpdateAppearance() {
@@ -219,8 +201,29 @@ void StudyWindow::UpdateCard(Card &card) {
   SetCard(&card);
 }
 
-void StudyWindow::ChangePack(CardPack *pack) { SetPack(pack); }
+void StudyWindow::ChangePack() {
+  auto pack = pack_combo->GetPack();
 
-void StudyWindow::UpdatePack(CardPack &pack) { SetPack(&pack); }
+  if (pack == nullptr) {
+    // 特殊情况
+    SetCard(nullptr);
+    statusbar_label->setText("没有选择卡组");
+    return;
+  }
+
+  SetCard(pack->ChooseCard(globals.settings.review));
+
+  int review_count = pack->CountCards(globals.settings.review),
+      total_count = pack->CountTotalCards();
+  QString review_text;
+  if (total_count == 0) {
+    review_text = "卡组中没有卡片";
+  } else if (review_count == 0) {
+    review_text = "卡片都复习完啦";
+  } else {
+    review_text = QString{"还有 %1 张卡片要复习"}.arg(review_count);
+  }
+  statusbar_label->setText(review_text);
+}
 
 }  // namespace aijika
