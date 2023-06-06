@@ -16,6 +16,10 @@ namespace aijika {
 /// 一组卡片内容.
 class CardStemList : public QList<CardStem> {
  public:
+  CardStemList() = default;
+
+  CardStemList(QList<CardStem> const &list);
+
   /// 将一组卡片内容编码成字符串.
   QByteArray Encode() const;
 
@@ -39,7 +43,7 @@ struct Prompt {
   CardStemList examples;
 
   /// 将模板填充到指定的对话请求 request.
-  void ToMessages(ApiRequest &request) const;
+  void ToMessages(ApiRequest &request, qsizetype batch) const;
 };
 
 /// 从程序的 resources/prompts.json 文件读取模板列表.

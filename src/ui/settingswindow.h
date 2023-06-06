@@ -49,6 +49,10 @@ class SettingsWindow : public QWidget {
   QLineEdit *api_key_edit;
   QComboBox *api_model_edit;
 
+  QHBoxLayout *about_layout;
+  QPushButton *about_button;
+  QPushButton *repo_button;
+
  public:
   explicit SettingsWindow(AppGlobals &globals);
 };

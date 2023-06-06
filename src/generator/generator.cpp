@@ -31,7 +31,7 @@ CardGenerator::CardGenerator(QObject *parent, AppSettings &settings)
 
 void CardGenerator::Generate(Prompt const &prompt, QString keywords) {
   ApiRequest request;
-  prompt.ToMessages(request);
+  prompt.ToMessages(request, keywords.count('\n') + 1);
 
   request.SetModel(settings.api_model);
   request.AddMessage(ApiRequest::Role::user, keywords);
@@ -43,11 +43,11 @@ void CardGenerator::ApiResponse(QString content) {
   QJsonParseError err;
   auto document = QJsonDocument::fromJson(content.toUtf8(), &err);
   if (document.isNull()) {
-    emit error("Content is not valid JSON: " + err.errorString());
+    emit error("生成器错误\n请重试\n\n详细信息：" + err.errorString());
     return;
   }
   if (!document.isArray()) {
-    emit error("Content format error: expected array");
+    emit error("生成器错误\n请重试\n\n详细信息：格式错误");
     return;
   }
 

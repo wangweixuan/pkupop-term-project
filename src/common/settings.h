@@ -39,7 +39,7 @@ class AppSettings : public QObject {
 
   /// 卡片界面的字体. 默认为 humanistic.
   PredefinedFont font_family;
-  /// 卡片界面的字号. 默认为 14.
+  /// 卡片界面的字号. 默认为 18.
   int font_size;
   /// 卡片界面的颜色主题. 默认为 yellow.
   PredefinedTheme theme;

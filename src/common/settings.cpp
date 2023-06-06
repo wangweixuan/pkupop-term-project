@@ -76,7 +76,7 @@ QStringList ToList(char const *const (&strings)[n]) {
 AppSettings::AppSettings()
     : QObject{nullptr},
       font_family{PredefinedFont::humanistic},
-      font_size{14},
+      font_size{18},
       theme{PredefinedTheme::yellow},
       review{ReviewOption::due_date},
       api_base_url{k_well_known_api_base_urls[0]},

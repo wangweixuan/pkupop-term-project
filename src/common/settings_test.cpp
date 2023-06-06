@@ -15,9 +15,9 @@ TEST(SettingsTest, StyleSheet) {
   EXPECT_EQ(
       settings.StyleSheet(),
       "QFrame, QPushButton { font-family: Optima, Candara, 'Noto Sans', "
-      "source-sans-pro, STKaiti, '楷体', sans-serif; font-size: 14pt; "
+      "source-sans-pro, STKaiti, '楷体', sans-serif; font-size: 18pt; "
       "background-color: #f9f4e9; color: #000000; border: none; }QLabel { "
-      "padding: 5px 14px; }QSplitter:handle { background-color: #000000 }");
+      "padding: 5px 18px; }QSplitter:handle { background-color: #000000 }");
 }
 
 }  // namespace

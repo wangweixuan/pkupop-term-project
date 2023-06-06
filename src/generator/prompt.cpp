@@ -13,9 +13,11 @@
 #include <QJsonValue>
 #include <QStringList>
 #include <QtDebug>
-#include <utility>
+#include <algorithm>
 
 namespace aijika {
+
+CardStemList::CardStemList(QList<CardStem> const &list) : QList{list} {}
 
 QByteArray CardStemList::Encode() const {
   QJsonArray array;
@@ -41,18 +43,23 @@ void CardStemList::Decode(QByteArray const &content) {
   }
 }
 
-void Prompt::ToMessages(ApiRequest &request) const {
+void Prompt::ToMessages(ApiRequest &request, qsizetype batch) const {
   using Role = ApiRequest::Role;
 
   request.AddMessage(Role::system, system);
 
-  QStringList keywords;
-  for (auto const &ex : examples) {
-    keywords << ex.keyword;
-  }
-  request.AddMessage(Role::user, keywords.join('\n'));
+  for (qsizetype i = 0; i < examples.size(); i += batch) {
+    CardStemList slice{
+        examples.sliced(i, std::min(examples.size() - i, batch))};
 
-  request.AddMessage(Role::assistant, examples.Encode());
+    QStringList keywords;
+    for (auto const &ex : slice) {
+      keywords << ex.keyword;
+    }
+    request.AddMessage(Role::user, keywords.join('\n'));
+
+    request.AddMessage(Role::assistant, slice.Encode());
+  }
 }
 
 QList<Prompt> LoadPromptsFromResources() {

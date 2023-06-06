@@ -52,7 +52,7 @@ TEST(PromptTest, ToMessages) {
 
   ApiRequest request;
   request.SetModel("gpt-3.5-turbo");
-  prompt.ToMessages(request);
+  prompt.ToMessages(request, 2);
 
   EXPECT_EQ(
       request.Build(),
@@ -107,7 +107,7 @@ TEST(PromptTest, LoadFromResources) {
   auto prompts = LoadPromptsFromResources();
 
   EXPECT_EQ(prompts[0].id, 101);
-  EXPECT_EQ(prompts[0].label, "英语单词");
+  EXPECT_EQ(prompts[0].label, "英译中");
 }
 
 }  // namespace

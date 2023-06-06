@@ -4,11 +4,9 @@
 
 #include "ui/composerdialog.h"
 
-#include <QBoxLayout>
+#include <QHBoxLayout>
 #include <QListWidget>
 #include <QMessageBox>
-#include <QScrollArea>
-#include <QScrollBar>
 
 #include "components/packcombo.h"
 #include "generator/generator.h"
@@ -28,7 +26,6 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
       generate_button{new QPushButton{"生成预览", this}},
       cancel_button{new QPushButton{"清空预览", this}},
       generated_layout{new QStackedLayout{(QWidget *)nullptr}},
-      generated_area{new QScrollArea{this}},
       generated_list{new QListWidget{this}},
       error_label{new QLabel{this}},
       pack_combo{new PackCombo{this, globals}},
@@ -47,9 +44,8 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   button_layout->addWidget(cancel_button);
   main_layout->addRow(" ", button_layout);
   main_layout->addRow("生成结果：", generated_layout);
-  generated_layout->addWidget(generated_area);
+  generated_layout->addWidget(generated_list);
   generated_layout->addWidget(error_label);
-  generated_area->setWidget(generated_list);
   main_layout->addRow("所属卡组：", pack_combo);
   bottom_button_layout->addWidget(confirm_button);
   bottom_button_layout->addWidget(leave_button);
@@ -58,6 +54,9 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
   prompt_combo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   pack_combo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   error_label->setAlignment(Qt::AlignCenter);
+  error_label->setTextFormat(Qt::PlainText);
+  error_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  error_label->setWordWrap(true);
 
   connect(generator, &CardGenerator::generated, this,
           &ComposerDialog::ShowResults);
@@ -78,6 +77,24 @@ ComposerDialog::ComposerDialog(QWidget *parent, AppGlobals &globals)
 }
 
 void ComposerDialog::Generate() {
+  auto keywords = keywords_input->toPlainText().trimmed();
+  if (keywords.isEmpty()) {
+    QMessageBox::information(this, "生成预览", "请输入卡片关键词。");
+    return;
+  }
+  if (keywords.size() >= 500 || keywords.count('\n') >= 20) {
+    auto reply = QMessageBox::question(
+        this, "生成预览", "关键词数量过多，可能生成失败。是否继续？",
+        QMessageBox::Yes | QMessageBox::No);
+    if (reply != QMessageBox::Yes) return;
+  }
+  if (globals.settings.api_key.isEmpty()) {
+    auto reply = QMessageBox::question(
+        this, "生成预览", "“API 设置”中没有指定密钥，可能生成失败。是否继续？",
+        QMessageBox::Yes | QMessageBox::No);
+    if (reply != QMessageBox::Yes) return;
+  }
+
   Prompt *prompt;
   prompt_id_t id = prompt_combo->currentData().toInt();
   for (auto &p : prompts) {
@@ -86,7 +103,7 @@ void ComposerDialog::Generate() {
       break;
     }
   }
-  generator->Generate(*prompt, keywords_input->toPlainText());
+  generator->Generate(*prompt, keywords);
 
   ShowError("正在生成……");
   cancel_button->setEnabled(true);
@@ -103,7 +120,7 @@ void ComposerDialog::Cancel() {
 void ComposerDialog::Confirm() {
   auto pack = pack_combo->GetPack();
   if (pack == nullptr) {
-    QMessageBox::information(this, "生成卡片", "请选择卡组。");
+    QMessageBox::information(this, "保存卡片", "请选择卡组。");
     return;
   }
 
@@ -115,7 +132,7 @@ void ComposerDialog::Confirm() {
 }
 
 void ComposerDialog::ShowResults(CardStemList cards) {
-  generated_layout->setCurrentWidget(generated_area);
+  generated_layout->setCurrentWidget(generated_list);
   cancel_button->setEnabled(true);
   confirm_button->setEnabled(true);
 

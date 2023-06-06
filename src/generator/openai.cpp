@@ -63,9 +63,12 @@ void ApiManager::Send(ApiRequest const &request) {
   }
   headers.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-  qDebug() << "Request:" << url;
+  auto payload = request.Build();
 
-  current_reply = mgr->post(headers, request.Build());
+  qDebug() << "Request:" << url;
+  qDebug() << "Request body:" << payload;
+
+  current_reply = mgr->post(headers, payload);
 }
 
 void ApiManager::Abort() {
@@ -79,37 +82,40 @@ void ApiManager::FinishReply(QNetworkReply *reply) {
 
   qDebug() << "Response:" << reply->url() << reply->error();
 
-  // TODO: make error messages more clear
-  // https://platform.openai.com/docs/guides/error-codes/api-errors
-  if (reply->error()) {
-    emit error(QVariant::fromValue(reply->error()).toString());
-    return;
-  }
   if (auto content_type =
           reply->header(QNetworkRequest::ContentTypeHeader).toString();
-      content_type != "application/json") {
-    emit error("Unexpected content type from server: " + content_type);
+      !content_type.startsWith("application/json")) {
+    // Note that 'application/json; charset=utf-8' is acceptable content type
+    if (auto err = reply->error(); err != QNetworkReply::NoError) {
+      emit error(
+          "网络错误\n请检查“API 设置”中的网址，以及您的网络环境\n\n详细信息：" +
+          QVariant::fromValue(err).toString());
+      return;
+    }
+
+    emit error("服务器异常\n请重试\n\n详细信息：" + content_type);
     return;
   }
 
   auto body = reply->readAll();
-  if (!body.size()) {
-    emit error("Empty response from server");
-    return;
-  }
 
   qDebug() << "Response body:" << body;
 
   QJsonParseError err;
   auto document = QJsonDocument::fromJson(body, &err);
   if (document.isNull()) {
-    emit error("Response is not valid JSON: " + err.errorString());
+    emit error("服务器异常\n请重试\n\n详细信息：" + err.errorString());
     return;
   }
 
+  // https://platform.openai.com/docs/guides/error-codes/api-errors
   if (document.object()["error"].isObject()) {
-    emit error("API error: " +
-               document.object()["error"].toObject()["message"].toString());
+    auto message = document.object()["error"].toObject()["message"].toString();
+    if (message.isEmpty()) {
+      message = document.object()["error"].toObject()["code"].toString();
+    }
+    emit error("服务器错误\n请检查“API 设置”中的密钥和模型\n\n详细信息：" +
+               message);
     return;
   }
 
@@ -118,7 +124,7 @@ void ApiManager::FinishReply(QNetworkReply *reply) {
                      .toObject()["message"]
                      .toObject()["content"];
   if (!message.isString()) {
-    emit error("API format error: expected string");
+    emit error("服务器异常\n请重试\n\n详细信息：格式错误");
     return;
   }
 

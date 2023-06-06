@@ -4,7 +4,9 @@
 
 #include "ui/settingswindow.h"
 
+#include <QDesktopServices>
 #include <QMessageBox>
+#include <QUrl>
 
 #include "common/settings.h"
 
@@ -35,7 +37,11 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
       api_layout{new QFormLayout{api_group}},
       api_base_url_edit{new QComboBox{this}},
       api_key_edit{new QLineEdit{this}},
-      api_model_edit{new QComboBox{this}} {
+      api_model_edit{new QComboBox{this}},
+
+      about_layout{new QHBoxLayout{nullptr}},
+      about_button{new QPushButton{"关于 AI 记卡", this}},
+      repo_button{new QPushButton{"项目主页", this}} {
   setWindowTitle("设置");
 
   appearance_layout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -84,6 +90,10 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
   api_layout->addRow("密钥：", api_key_edit);
   api_layout->addRow("模型：", api_model_edit);
   main_layout->addWidget(api_group);
+
+  about_layout->addWidget(about_button);
+  about_layout->addWidget(repo_button);
+  main_layout->addLayout(about_layout);
 
   font_family_box->setCurrentIndex(
       font_family_box->findData(int(globals.settings.font_family)));
@@ -135,6 +145,21 @@ SettingsWindow::SettingsWindow(AppGlobals& globals)
           [&](QString const& text) { globals.settings.SetApiKey(text); });
   connect(api_model_edit, &QComboBox::currentTextChanged,
           [&](QString const& text) { globals.settings.SetApiModel(text); });
+
+  connect(about_button, &QPushButton::clicked, [&]() {
+    QMessageBox::information(
+        this, "关于 AI 记卡",
+        "《AI 记卡》是北京大学《程序设计实习》课程的大作业。"
+        "本程序基于 Qt 开发。\n\n"
+        "作者：Wang Weixuan, Hou Xusen, Zheng Shiqi\n\n"
+        "发行日期：2023 年 6 月\n\n"
+        "许可证：Apache-2.0\n\n"
+        "项目主页：https://github.com/wangweixuan/pkupop-term-project");
+  });
+  connect(repo_button, &QPushButton::clicked, [&]() {
+    QDesktopServices::openUrl(
+        QUrl{"https://github.com/wangweixuan/pkupop-term-project"});
+  });
 }
 
 }  // namespace aijika

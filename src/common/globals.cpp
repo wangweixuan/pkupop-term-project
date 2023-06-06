@@ -47,6 +47,7 @@ void AppGlobals::SaveSettings() {
 }
 
 void AppGlobals::RestoreSettings() {
+  if (!settings_file.exists()) return;
   qDebug() << "Restore settings:" << settings_file.fileName();
 
   settings_file.open(QFile::ReadOnly);
@@ -65,6 +66,7 @@ void AppGlobals::SaveDatabase() {
 }
 
 void AppGlobals::RestoreDatabase() {
+  if (!db_file.exists()) return;
   qDebug() << "Restore database:" << db_file.fileName();
 
   db_file.open(QFile::ReadOnly);

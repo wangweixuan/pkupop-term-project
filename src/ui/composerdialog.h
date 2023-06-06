@@ -12,8 +12,6 @@
 #include <QList>
 #include <QListWidget>
 #include <QPushButton>
-#include <QScrollArea>
-#include <QScrollBar>
 #include <QStackedLayout>
 #include <QTextEdit>
 #include <QWidget>
@@ -57,8 +55,6 @@ class ComposerDialog : public QDialog {
   QPushButton *cancel_button;
 
   QStackedLayout *generated_layout;
-  /// 生成文本, 滚动界面
-  QScrollArea *generated_area;
   /// 生成界面
   QListWidget *generated_list;
   /// 错误标签
