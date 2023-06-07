@@ -78,9 +78,8 @@ void EditorDialog::Save() {
     return;
   }
 
-  CardStem stem{.keyword = keyword_edit->text(),
-                .question = front_edit->toPlainText(),
-                .answer = back_edit->toPlainText()};
+  CardStem stem{keyword_edit->text(), front_edit->toPlainText(),
+                back_edit->toPlainText()};
   globals.db.EditCard(stem, *card);
   close();
 }

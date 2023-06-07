@@ -61,20 +61,27 @@ qt_add_resources(aijika "resources" PREFIX "/" FILES
     resources/prompts.json
 )
 
-set_source_files_properties(resources/icon.icns PROPERTIES
-    MACOSX_PACKAGE_LOCATION "Resources")
+if(APPLE)
+    set_source_files_properties(resources/icon.icns PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources")
 
-set_target_properties(aijika PROPERTIES
-    OUTPUT_NAME Aijika
-    MACOSX_BUNDLE TRUE
-    MACOSX_BUNDLE_BUNDLE_NAME "AI 记卡"
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_GUI_IDENTIFIER io.github.pkupop.aijika
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
-    MACOSX_BUNDLE_COPYRIGHT "Copyright 2023 Wang Weixuan, Hou Xusen, Zheng Shiqi"
-    MACOSX_BUNDLE_ICON_FILE icon.icns
-    WIN32_EXECUTABLE TRUE
-)
+    set_target_properties(aijika PROPERTIES
+        OUTPUT_NAME "AI 记卡"
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "AI 记卡"
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_GUI_IDENTIFIER io.github.pkupop.aijika
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
+        MACOSX_BUNDLE_COPYRIGHT "Copyright 2023 Wang Weixuan, Hou Xusen, Zheng Shiqi"
+        MACOSX_BUNDLE_ICON_FILE icon.icns
+    )
+else()
+    set_target_properties(aijika PROPERTIES
+        OUTPUT_NAME Aijika
+        WIN32_EXECUTABLE TRUE
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
+    )
+endif()
 
 install(TARGETS aijika
     BUNDLE DESTINATION .
