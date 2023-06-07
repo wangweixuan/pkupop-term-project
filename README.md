@@ -13,10 +13,20 @@
 依赖项:
 
 - Qt 6.5,
-- CMake 3.19 以上.
+- CMake 3.19 以上,
+- 编译器: clang, GCC, MSVC 均可.
 
-Mac 平台: `brew install qt cmake` 即可.
-Windows 平台: 下载[在线安装器](https://mirrors.tuna.tsinghua.edu.cn/help/qt/), 勾选并安装 Qt、MinGW.
+推荐使用 [aqt](https://github.com/miurahr/aqtinstall) 工具来安装依赖项.
+
+1. 安装 aqt: `pip install aqtinstall`
+2. 安装 Qt 框架:
+   - Windows x64 平台, MinGW: `aqt install-qt windows desktop 6.5.1 win64_mingw --archives qttools qtbase MinGW`
+   - Windows x64 平台, MSVC: `aqt install-qt windows desktop 6.5.1 win64_msvc2019_64 --archives qttools qtbase`
+   - Mac 平台, clang: `aqt install-qt mac desktop 6.5.1 clang_64 --archives qttools qtbase`
+3. 安装构建工具:
+   - 例如, 在 Windows 平台安装 CMake: `aqt install-tool windows desktop tools_cmake`
+
+这些命令仅供参考, 应当根据您的环境进行调整. 此外, 可以在 [aqt 网站](https://ddalcino.github.io/aqt-list-server/)上查找所需要的包和安装命令, 或使用 Qt 官方安装程序.
 
 ### 使用 Qt Creator 构建
 
@@ -27,6 +37,17 @@ Windows 平台: 下载[在线安装器](https://mirrors.tuna.tsinghua.edu.cn/hel
 
 1. 配置: `cmake -B build .`
 2. 构建: `cmake --build build`
+
+### 部署
+
+1. 切换到 exe 文件或 app 文件夹所在目录.
+2. 将 Qt 框架打包:
+   - Windows 平台: `windeployqt Aijika.exe`
+   - Mac 平台: `macdeployqt AI\ 记卡.app -dmg`
+3. 在 Windows 平台上, 可用 InnoSetup 制作安装程序.
+   详见本仓库 `.github/workflows/windows.yml` 中的流程.
+
+<!-- 目前 Homebrew 安装的 macdeployqt 无法正常工作, 见 https://github.com/orgs/Homebrew/discussions/2823 -->
 
 ### 单元测试
 
