@@ -29,7 +29,7 @@ jobs:
       - name: Package
         run: |
           cd build\out\Release
-          windeployqt Aijika.exe --no-plugins --no-translations --no-system-d3d-compiler --no-opengl-sw
+          windeployqt Aijika.exe --no-translations --no-system-d3d-compiler --no-opengl-sw
           cd ..\..\..
           cp LICENSE.txt build\out\LICENSE.txt
           iscc innosetup.iss

@@ -24,8 +24,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "build\out\Release\Aijika.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\out\Release\Qt*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\out\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{commonprograms}\AI 记卡"; Filename: "{app}\Aijika.exe"
