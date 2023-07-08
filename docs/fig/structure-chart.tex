@@ -1,0 +1,162 @@
+\tikzset{
+  label/.style = {
+      align = center,
+      node distance = 2mm,
+    },
+  class/.style = {
+      rectangle,
+      align = center,
+      ultra thick,
+      minimum width = 30mm,
+      node distance = 5mm,
+    },
+  resource/.style = {
+      trapezium,
+      trapezium left angle = 60,
+      trapezium right angle = 120,
+      trapezium stretches = true,
+      align = center,
+      ultra thick,
+      minimum width = 30mm,
+      node distance = 5mm,
+    },
+  frame/.style = {
+      rounded corners = 5mm,
+      inner sep = 4mm,
+      ultra thick,
+      dashed,
+    },
+  service/.style = {
+      ellipse,
+      align = center,
+      ultra thick,
+      node distance = 5mm,
+    },
+  relation/.style = {
+      ->,
+      ultra thick,
+    },
+  ui/.style = {
+      draw = magenta,
+    },
+  common/.style = {
+      draw = blue!80!white,
+    },
+  common text/.style = {
+      text = blue!80!white,
+    },
+  model/.style = {
+      draw = orange!80!black,
+    },
+  model text/.style = {
+      text = orange!80!black,
+    },
+  gen/.style = {
+      draw = green!50!black,
+    },
+  gen text/.style = {
+      text = green!50!black,
+    },
+}
+\begin{tikzpicture}
+  \node (main) {
+    main
+  };
+  \node[ui,class,right=of {[yshift=-0.8em]$(main.east)$},minimum width=35mm] (windows) {
+      窗口\\
+      StudyWindow\\
+      ManagerWindow\\
+      SettingsWindow
+    };
+  \node[ui,class,below=3mm of windows,minimum width=35mm] (dialogs) {
+    对话框\\
+    ComposerDialog\\
+    EditorDialog
+  };
+  \node[label,above=of windows] (ui label) {
+    用户界面\\
+    ui
+  };
+  \node[ui,frame,fit=(ui label)(dialogs)] (ui frame) {};
+  %
+  \node[common,common text,class,below right=12mm and -10mm of dialogs.south west] (globals) {
+    全局状态\\
+    AppGlobals
+  };
+  \node[common,common text,class,right=of globals] (settings) {
+    设置\\
+    AppSettings
+  };
+  \node[common,resource,below=of globals] (db file) {
+    数据库文件
+  };
+  \node[common,resource,below=of settings] (settings file) {
+    设置文件
+  };
+  \node[common,frame,fit=(globals)(settings)(settings file)] (common frame) {};
+  %
+  \node[model,model text,class,left=12mm of globals] (card db) {
+    卡片数据库\\
+    CardDatabase
+  };
+  \node[model,class,above=8mm of card db] (card pack) {
+    卡组\\
+    CardPack
+  };
+  \node[model,class,above=8mm of card pack] (card) {
+    卡片\\
+    Card
+  };
+  \node[label,above=of card] (card label) {
+    数据模型\\
+    model
+  };
+  \node[model text,right=0mm of {$(card db.north)!0.5!(card pack.south)$}] (db vector) {
+    vector
+  };
+  \node[model text,right=0mm of {$(card pack.north)!0.5!(card.south)$}] (pack vector) {
+    vector
+  };
+  \node[model,frame,fit=(card label)(card db)] (card frame) {};
+  %
+  \coordinate (prompts blc) at ([xshift=12mm]$(dialogs.south east)$);
+  \node[gen,resource,anchor=bottom left corner,at=(prompts blc)] (prompts) {
+    预设模板
+  };
+  \coordinate (prompt sw) at ($(prompts blc)+(prompts.north)-(prompts.south)$);
+  \node[gen,class,above right=5mm and 0mm of prompt sw,minimum width=20mm] (prompt) {
+    模板\\
+    Prompt
+  };
+  \node[gen,class,right=of prompt] (api) {
+    API 客户端\\
+    ApiManager
+  };
+  \node[gen,gen text,class,above=of {$(prompt.north)!0.5!(api.north)$}] (generator) {
+      卡片生成器\\
+      CardGenerator
+    };
+  \node[gen,frame,fit=(generator)(prompts blc)(api)] (gen frame) {};
+  \node[below=20mm of api] (network library) {
+    Qt::Network 库
+  };
+  \node[gen,service,below=of network library] (ai) {
+    OpenAI
+  };
+  %
+  \draw[relation] (main) -- ([xshift=10mm]$(main.east)$);
+  \draw[relation] (main) to [bend right=20] (globals);
+  \draw[ui,relation] ([yshift=-2mm]$(dialogs.south)$) to [bend right=20] (globals);
+  \draw[ui,relation] ([xshift=-3mm]$(dialogs.east)$) to [bend left=20] (generator);
+  \draw[common,relation] (globals) -- (settings);
+  \draw[common,relation] (globals) -- (db file);
+  \draw[common,relation] (globals.south east) -- (settings file.west);
+  \draw[common,relation] (globals) -- (card db);
+  \draw[model,relation] (card db) -- (card pack);
+  \draw[model,relation] (card pack) -- (card);
+  \draw[gen,relation] (generator) -- (prompt);
+  \draw[gen,relation] (generator) -- (api);
+  \draw[gen,relation] (prompt) -- (prompts);
+  \draw[gen,relation] (api) -- (network library);
+  \draw[gen,relation] (network library) -- (ai);
+\end{tikzpicture}

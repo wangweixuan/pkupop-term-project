@@ -1,0 +1,98 @@
+\NewDocumentCommand { \nodelabel } { m m m m } {
+  \node[label={[text=black!60]#4:#1}] at (#2:#3) {};
+}
+\NewDocumentCommand { \nodetext } { m m m } {
+  \node[align=center] at (#2:#3) {#1};
+}
+\NewDocumentCommand { \drawray } { m m m } {
+  \draw[ultra thick] (#1:#2) -- (#1:#3);
+}
+\NewDocumentCommand { \drawarc } { m m m } {
+  \draw[ultra thick] (#1:#3) arc (#1:#2:#3);
+}
+\NewDocumentCommand { \drawsector } { m m m } {
+  \draw[ultra thick] (0,0) -- (#1:#3) arc (#1:#2:#3) -- cycle;
+}
+\NewDocumentCommand { \fillsector } { m m m m } {
+  \fill (#1:#3) -- (#1:#4) arc (#1:#2:#4) -- (#2:#3) arc (#2:#1:#3);
+}
+\def\normalcolon{:}
+\ExplSyntaxOn
+\fp_new:N \l_angle_fp
+\fp_new:N \l_start_fp
+\fp_new:N \l_end_fp
+\fp_new:N \l_mid_fp
+\dim_new:N \l_outer_dim
+\dim_new:N \l_inner_dim
+\NewDocumentCommand { \piechart } { m } {
+  \fp_set:Nn \l_angle_fp { 0 }
+  \clist_map_inline:nn { #1 } { \sectorgroup ##1 }
+}
+\NewDocumentCommand { \sectorgroup } { m o m m m } {
+  \fp_set:Nn \l_start_fp { \l_angle_fp }
+  \fp_set:Nn \l_tmpa_fp { 360 * #1 / 3485 / 2 }
+  \fp_set:Nn \l_end_fp { \l_angle_fp + 2 * \l_tmpa_fp }
+  \fp_set:Nn \l_mid_fp { \l_angle_fp + \l_tmpa_fp }
+  \fp_set:Nn \l_tmpb_fp { 0.8 * cscd(\l_tmpa_fp) }
+  \dim_set:Nn \l_outer_dim { \fp_eval:n { sqrt( (30 * sind(\l_tmpa_fp))^2 + (30 * cosd(\l_tmpa_fp) - \l_tmpb_fp)^2 ) } mm }
+  \dim_set:Nn \l_inner_dim { \fp_eval:n { sqrt( (20 * sind(\l_tmpa_fp))^2 + (20 * cosd(\l_tmpa_fp) - \l_tmpb_fp)^2 ) } mm }
+  \begin{scope}[shift=(\fp_use:N \l_mid_fp\normalcolon \fp_use:N \l_tmpb_fp mm), draw=#3!40, fill=#3!20]
+    \fillsector { \fp_use:N \l_start_fp } { \fp_use:N \l_end_fp } { 0mm } { \dim_use:N \l_inner_dim }
+    \begin{scope}[draw=#3!30, fill=#3!10]
+      \fillsector { \fp_use:N \l_start_fp } { \fp_use:N \l_end_fp } { \dim_use:N \l_inner_dim } { \dim_use:N \l_outer_dim }
+      \clist_map_inline:nn { #5 } { \sector ##1 }
+      \drawarc { \fp_use:N \l_start_fp } { \fp_use:N \l_end_fp } { \dim_use:N \l_inner_dim }
+    \end{scope}
+    \drawsector { \fp_use:N \l_start_fp } { \fp_use:N \l_end_fp } { \dim_use:N \l_outer_dim }
+    \nodetext { \IfValueT { #2 } { #2 \\ } #1 行 } { \fp_use:N \l_mid_fp } { \dim_eval:n { #4 \l_inner_dim } }
+  \end{scope}
+}
+\NewDocumentCommand { \sector } { m o } {
+  \fp_compare:nNnF { \l_angle_fp } = { \l_start_fp } {
+      \drawray { \fp_use:N \l_angle_fp } { \dim_use:N \l_inner_dim } { \dim_use:N \l_outer_dim }
+    }
+  \IfValueT { #2 } {
+    \fp_set:Nn \l_tmpa_fp { \l_angle_fp + 360 * #1 / 3485 / 2 }
+    \nodelabel { #2 } { \fp_use:N \l_tmpa_fp } { \dim_use:N \l_outer_dim }
+    { \fp_eval:n { \l_tmpa_fp - (2*sind(2*\l_tmpa_fp) + sind(4*\l_tmpa_fp)) * 180/pi/8} }
+  }
+  \fp_gadd:Nn \l_angle_fp { 360 * #1 / 3485 }
+}
+\ExplSyntaxOff
+\begin{tikzpicture}
+  \piechart { {
+        {211}{black!60!white}{1}{
+            {{35}},
+            {135}[支持文件],
+            {{41}}
+          }
+      }, {
+        {1390}[用户界面]{magenta}{0.8}{
+            {225}[SettingsWindow],
+            {280}[ManagerWindow],
+            {311}[StudyWindow],
+            {251}[ComposerDialog],
+            {147}[EditorDialog],
+            {176}[shared]
+          }
+      }, {
+        {502}[数据模型]{orange!80!black}{1}{
+            {189}[Card],
+            {140}[CardPack],
+            {173}[CardDatabase]
+          }
+      }, {
+        {525}[公共]{blue!80!white}{0.9}{
+            {160}[AppGlobals],
+            {307}[AppSettings],
+            {58}[main]
+          }
+      }, {
+        {857}[卡片生成器]{green!50!black}{0.9}{
+            {284}[ApiManager],
+            {197}[CardGenerator],
+            {274}[Prompt],
+            {102}[prompts.json]
+          }
+      } }
+\end{tikzpicture}
